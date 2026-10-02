@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnyList Pro</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        neutral: {
+                            850: '#1f1f1f',
+                            900: '#171717',
+                            950: '#0a0a0a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        body {
+            background-color: #0a0a0a;
+            color: #e5e5e5;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #404040; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #525252; }
+
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+
+        .line-through-custom { text-decoration: line-through; color: #737373; }
+        
+        .layout-container { display: flex; height: 100vh; }
+        .sidebar { width: 260px; background-color: #171717; border-right: 1px solid #262626; display: flex; flex-direction: column; transition: transform 0.3s ease; z-index: 40; }
+        .main-content { flex: 1; overflow-y: auto; background-color: #0a0a0a; display: flex; flex-direction: column; }
+        
+        @media (max-width: 768px) {
+            .sidebar { position: fixed; height: 100vh; transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); box-shadow: 4px 0 24px rgba(0,0,0,0.5); }
+        }
+
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="antialiased text-sm">
+
+    <div class="layout-container relative">
+        
+        <div id="mobile-overlay" class="fixed inset-0 bg-black/50 z-30 hidden md:hidden backdrop-blur-sm transition-opacity opacity-0"></div>
+
+        <aside id="sidebar" class="sidebar p-4 h-full flex flex-col gap-6 absolute md:relative">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 px-2">
+                    <div class="w-8 h-8 bg-neutral-800 rounded-lg flex items-center justify-center text-white border border-neutral-700 shadow-sm">
+                        <i class="ph ph-stack text-lg"></i>
+                    </div>
+                    <h1 class="font-semibold text-white tracking-tight text-base">AnyList</h1>
+                </div>
+                <button id="btn-close-sidebar" class="md:hidden text-neutral-400 hover:text-white p-2">
+                    <i class="ph ph-x text-xl"></i>
+                </button>
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <button class="nav-btn w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors font-medium" data-target="products">
+                    <i class="ph ph-package text-lg"></i> Catálogo
+                </button>
+                <button class="nav-btn w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors font-medium" data-target="stats">
+                    <i class="ph ph-chart-pie-slice text-lg"></i> Estatísticas
+                </button>
+            </div>
+
+            <div class="flex flex-col gap-2 flex-1 overflow-y-auto hide-scroll mt-2">
+                <div class="flex items-center justify-between px-2 text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">
+                    <span>Listas</span>
+                    <button id="btn-show-new-list" class="hover:text-white transition-colors bg-neutral-800 hover:bg-neutral-700 p-1.5 rounded-md flex items-center justify-center"><i class="ph ph-plus"></i></button>
+                </div>
+                <div id="sidebar-lists" class="flex flex-col gap-1"></div>
+            </div>
+
+            <div class="mt-auto px-3 py-3 border-t border-neutral-800/50 text-xs text-neutral-500 flex items-center gap-2 bg-neutral-900/50 rounded-lg">
+                <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></div> Local Storage
+            </div>
+        </aside>
+
+        <main class="main-content relative w-full">
+            
+            <header class="md:hidden flex items-center justify-between p-4 border-b border-neutral-800 bg-neutral-900/90 backdrop-blur sticky top-0 z-20 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <button id="btn-open-sidebar" class="text-neutral-400 hover:text-white p-1">
+                        <i class="ph ph-list text-2xl"></i>
+                    </button>
+                    <h2 id="mobile-header-title" class="font-medium text-white truncate">AnyList</h2>
+                </div>
+            </header>
+
+            <div class="p-4 md:p-8 max-w-4xl mx-auto w-full flex-1 flex flex-col gap-8 pb-24">
+                
+                <!-- VIEW: LIST -->
+                <section id="view-list" class="view-section flex flex-col gap-6 hidden">
+                    <div class="flex justify-between items-center hidden md:flex">
+                        <h2 id="current-list-title" class="text-2xl font-bold text-white tracking-tight truncate max-w-md">Lista</h2>
+                        <button id="btn-delete-list" class="text-neutral-500 hover:text-red-400 text-sm flex items-center gap-1.5 transition-colors bg-neutral-900 px-3 py-1.5 rounded-lg border border-neutral-800 focus:outline-none">
+                            <i class="ph ph-trash"></i> Apagar
+                        </button>
+                    </div>
+
+                    <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-4 md:p-5 shadow-sm">
+                        <form id="form-add-item" class="flex flex-col gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                                <div class="md:col-span-5 flex flex-col gap-1.5 relative">
+                                    <div class="flex justify-between items-center w-full">
+                                        <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Item</label>
+                                        <button type="button" id="btn-open-catalog-add" class="text-[10px] text-blue-400 hover:text-blue-300 uppercase font-semibold flex items-center gap-1"><i class="ph ph-book-open"></i> Ver Catálogo</button>
+                                    </div>
+                                    <input type="text" id="input-item-name" required placeholder="Ex: Maçã Fuji ou Arroz" autocomplete="off"
+                                        class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-neutral-500 transition-all">
+                                    <ul id="product-suggestions" class="absolute top-[105%] left-0 right-0 bg-neutral-800 border border-neutral-700 rounded-lg shadow-xl max-h-48 overflow-y-auto hidden z-50 py-1"></ul>
+                                </div>
+                                <div class="md:col-span-3 flex flex-col gap-1.5">
+                                    <div class="flex justify-between items-center">
+                                        <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Categoria</label>
+                                        <button type="button" id="btn-manage-cat-inline" class="text-[10px] text-blue-400 hover:text-blue-300 uppercase font-semibold">Editar</button>
+                                    </div>
+                                    <select id="input-item-category" required class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-500 transition-all cursor-pointer"></select>
+                                </div>
+                                <div class="grid grid-cols-2 gap-3 md:col-span-4">
+                                    <div class="flex flex-col gap-1.5">
+                                        <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Qtd & Unidade</label>
+                                        <div class="flex gap-1">
+                                            <input type="number" id="input-item-qtd" required min="0.001" step="any" value="1" 
+                                                class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-2 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-500 text-center">
+                                            <select id="input-item-unit" class="bg-neutral-950 border border-neutral-800 rounded-lg px-2 py-2.5 text-xs text-white focus:outline-none focus:border-neutral-500">
+                                                <option value="un">un</option>
+                                                <option value="kg">kg</option>
+                                                <option value="g">g</option>
+                                                <option value="L">L</option>
+                                                <option value="ml">ml</option>
+                                                <option value="pct">pct</option>
+                                                <option value="cx">cx</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                                <div class="md:col-span-4 flex flex-col gap-1.5">
+                                    <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Preço un. (Opcional)</label>
+                                    <input type="number" id="input-item-price" min="0" step="0.01" placeholder="0.00" 
+                                        class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-500 transition-all placeholder-neutral-700">
+                                </div>
+                                <div class="md:col-span-8 flex justify-end pt-1">
+                                    <button type="submit" class="w-full md:w-auto bg-white text-black hover:bg-neutral-200 px-6 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center justify-center gap-2">
+                                        <i class="ph ph-plus-bold"></i> Adicionar Item
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="flex flex-col gap-2 mt-2">
+                        <div class="flex justify-between text-xs text-neutral-400 font-medium">
+                            <span id="list-progress-text">0/0 itens</span>
+                            <span id="list-total-text" class="text-white">Total: R$ 0,00</span>
+                        </div>
+                        <div class="h-2 w-full bg-neutral-900 rounded-full overflow-hidden border border-neutral-800">
+                            <div id="list-progress-bar" class="h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div id="empty-list" class="hidden py-16 text-center text-neutral-500 flex-col items-center gap-3">
+                        <div class="w-16 h-16 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center mb-2">
+                            <i class="ph ph-shopping-cart text-3xl opacity-50"></i>
+                        </div>
+                        <p class="font-medium">Lista vazia.</p>
+                        <p class="text-xs">Adicione itens no formulário acima ou selecione do catálogo.</p>
+                    </div>
+
+                    <div class="flex flex-col gap-8">
+                        <div id="container-pending-items" class="flex flex-col gap-3">
+                            <h3 class="text-xs font-bold text-neutral-500 uppercase tracking-widest border-b border-neutral-800 pb-2 flex justify-between">
+                                Pendentes <span id="count-pending" class="text-neutral-600">0</span>
+                            </h3>
+                            <ul id="list-items-pending" class="flex flex-col gap-2.5"></ul>
+                        </div>
+                        
+                        <div id="container-bought-items" class="flex flex-col gap-3 opacity-70 hover:opacity-100 transition-opacity duration-300">
+                            <h3 class="text-xs font-bold text-neutral-500 uppercase tracking-widest border-b border-neutral-800 pb-2 flex justify-between">
+                                Comprados <span id="count-bought" class="text-neutral-600">0</span>
+                            </h3>
+                            <ul id="list-items-bought" class="flex flex-col gap-2.5"></ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- VIEW: PRODUCTS CATALOGUE -->
+                <section id="view-products" class="view-section flex flex-col gap-6 hidden">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">Catálogo</h2>
+                        <p class="text-sm text-neutral-400 mt-1">Produtos frequentes salvos automaticamente ou manualmente.</p>
+                    </div>
+
+                    <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-5 shadow-sm">
+                        <form id="form-add-product" class="flex flex-col sm:flex-row gap-4 items-end">
+                            <div class="flex-1 flex flex-col gap-1.5 w-full">
+                                <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Nome do Produto</label>
+                                <input type="text" id="input-prod-name" required placeholder="Ex: Detergente" 
+                                    class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-500">
+                            </div>
+                            <div class="w-full sm:w-48 flex flex-col gap-1.5">
+                                <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Categoria Padrão</label>
+                                <select id="input-prod-category" required class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-500"></select>
+                            </div>
+                            <div class="w-full sm:w-32 flex flex-col gap-1.5">
+                                <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Preço Base</label>
+                                <input type="number" id="input-prod-price" min="0" step="0.01" placeholder="Opcional" 
+                                    class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-500">
+                            </div>
+                            <button type="submit" class="w-full sm:w-auto bg-neutral-200 text-black hover:bg-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors">
+                                Salvar
+                            </button>
+                        </form>
+                    </div>
+                    <ul id="list-products" class="grid grid-cols-1 md:grid-cols-2 gap-3"></ul>
+                </section>
+
+                <!-- VIEW: STATISTICS -->
+                <section id="view-stats" class="view-section flex flex-col gap-6 hidden">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">Estatísticas</h2>
+                        <p class="text-sm text-neutral-400 mt-1">Gastos baseados nos itens <strong class="text-white">já comprados</strong> de todas as listas.</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-sm flex flex-col items-center sm:items-start">
+                            <span class="text-xs font-bold text-neutral-500 uppercase tracking-widest mb-2">Gasto Total</span>
+                            <span id="stat-total-spent" class="text-4xl font-bold text-white tracking-tight">R$ 0,00</span>
+                        </div>
+                        <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-sm flex flex-col items-center sm:items-start">
+                            <span class="text-xs font-bold text-neutral-500 uppercase tracking-widest mb-2">Itens Comprados</span>
+                            <span id="stat-total-items" class="text-4xl font-bold text-white tracking-tight">0</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-sm">
+                        <h3 class="text-xs font-bold text-neutral-500 uppercase tracking-widest mb-6">Gasto por Categoria</h3>
+                        <div id="stats-categories" class="flex flex-col gap-5"></div>
+                    </div>
+                </section>
+
+                <!-- VIEW: EMPTY -->
+                <section id="view-empty-lists" class="view-section flex flex-col items-center justify-center gap-5 py-24 hidden h-full">
+                    <div class="w-20 h-20 bg-neutral-900 border border-neutral-800 rounded-2xl flex items-center justify-center text-neutral-500 shadow-sm">
+                        <i class="ph ph-stack text-4xl"></i>
+                    </div>
+                    <div class="text-center max-w-xs">
+                        <h2 class="text-xl font-semibold text-white mb-2">Nenhuma lista ativa</h2>
+                        <p class="text-sm text-neutral-400 leading-relaxed">Selecione uma lista no menu lateral ou crie uma nova para começar.</p>
+                    </div>
+                    <button class="btn-trigger-new-list mt-2 bg-white text-black px-6 py-3 rounded-lg text-sm font-semibold hover:bg-neutral-200 transition-colors shadow-lg shadow-white/10">
+                        Criar Nova Lista
+                    </button>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL: NEW LIST -->
+    <div id="modal-new-list" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex-col items-center justify-center z-50 p-4 transition-opacity">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-sm shadow-2xl p-6">
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="font-semibold text-white text-lg tracking-tight">Criar Nova Lista</h3>
+                <button class="btn-close-modal text-neutral-500 hover:text-white p-1 rounded-md hover:bg-neutral-800 transition-colors"><i class="ph ph-x"></i></button>
+            </div>
+            <form id="form-new-list" class="flex flex-col gap-4">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Nome da Lista</label>
+                    <input type="text" id="input-new-list-name" required placeholder="Ex: Compras do Mês" autocomplete="off"
+                        class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-neutral-500 transition-all">
+                </div>
+                <button type="submit" class="w-full bg-white text-black hover:bg-neutral-200 px-4 py-3 rounded-lg text-sm font-semibold transition-colors mt-2">
+                    Criar Lista
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD PRICE ON CHECK -->
+    <div id="modal-add-price" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex-col items-center justify-center z-50 p-4 transition-opacity">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-xs shadow-2xl p-6">
+            <div class="flex justify-between items-center mb-2">
+                <h3 class="font-semibold text-white tracking-tight">Informar Preço</h3>
+                <button class="btn-close-modal text-neutral-500 hover:text-white p-1 rounded-md hover:bg-neutral-800 transition-colors"><i class="ph ph-x"></i></button>
+            </div>
+            <p class="text-xs text-neutral-500 mb-4 leading-snug">Você está marcando este item como comprado, mas não definiu um preço. Qual o valor pago (por unidade/kg)?</p>
+            <p id="modal-price-item-name" class="text-sm font-medium text-blue-400 mb-5 truncate bg-blue-500/10 px-3 py-2 rounded-lg border border-blue-500/20"></p>
+            
+            <form id="form-add-price" class="flex flex-col gap-4">
+                <input type="hidden" id="input-price-item-id">
+                <input type="hidden" id="input-price-action-type">
+                <div class="relative">
+                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-500 text-sm">R$</span>
+                    <input type="number" id="input-price-val" required min="0.01" step="0.01" placeholder="0.00" 
+                        class="w-full bg-neutral-950 border border-neutral-800 rounded-lg pl-9 pr-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 transition-all">
+                </div>
+                <button type="submit" class="w-full bg-blue-600 text-white hover:bg-blue-500 px-4 py-3 rounded-lg text-sm font-semibold transition-colors mt-2">
+                    Confirmar Compra
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: CATEGORIES -->
+    <div id="modal-categories" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex-col items-center justify-center z-50 p-4">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col">
+            <div class="px-6 py-5 border-b border-neutral-800 flex justify-between items-center bg-neutral-900/50">
+                <h3 class="font-semibold text-white tracking-tight">Gerenciar Categorias</h3>
+                <button class="btn-close-modal text-neutral-500 hover:text-white p-1 rounded-md hover:bg-neutral-800 transition-colors"><i class="ph ph-x"></i></button>
+            </div>
+            <div class="p-6 flex flex-col gap-5 bg-neutral-900">
+                <form id="form-add-category" class="flex gap-2">
+                    <input type="text" id="input-new-category" placeholder="Nova categoria..." required autocomplete="off"
+                        class="flex-1 bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-500">
+                    <button type="submit" class="bg-neutral-800 text-white hover:bg-neutral-700 border border-neutral-700 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors">
+                        Adicionar
+                    </button>
+                </form>
+                <div class="max-h-64 overflow-y-auto pr-1 hide-scroll">
+                    <ul id="list-categories-manage" class="flex flex-col gap-2"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: CATALOG SELECT -->
+    <div id="modal-select-catalog" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex-col items-center justify-center z-50 p-4 transition-opacity">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+            <div class="px-6 py-5 border-b border-neutral-800 flex justify-between items-center bg-neutral-900/50">
+                <h3 class="font-semibold text-white tracking-tight flex items-center gap-2"><i class="ph ph-book-open text-blue-400"></i> Catálogo</h3>
+                <button class="btn-close-modal text-neutral-500 hover:text-white p-1 rounded-md hover:bg-neutral-800 transition-colors"><i class="ph ph-x"></i></button>
+            </div>
+            <div class="p-4 overflow-y-auto hide-scroll flex-1">
+                <ul id="list-catalog-selection" class="flex flex-col gap-2"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="fixed bottom-6 right-6 transform translate-y-24 opacity-0 transition-all duration-300 bg-neutral-800 text-white px-5 py-3.5 rounded-xl shadow-xl border border-neutral-700 text-sm flex items-center gap-3 z-[60] pointer-events-none">
+        <i class="ph ph-check-circle text-emerald-400 text-xl" id="toast-icon"></i>
+        <span id="toast-message" class="font-medium"></span>
+    </div>
+
+    <script>
+        const DEFAULT_CATEGORIES = ['Mercado', 'Benfica', 'Mercado Livre', 'Contas', 'Assinaturas'];
+        const STORAGE_KEY = 'anylist_local_data_v2';
+
+        let appData = {
+            categories: [...DEFAULT_CATEGORIES],
+            lists: [],
+            items: [],
+            products: [],
+            activeListId: null
+        };
+
+        let state = { activeView: 'empty-lists' };
+
+        const DOM = {
+            sidebar: {
+                self: document.getElementById('sidebar'),
+                overlay: document.getElementById('mobile-overlay'),
+                openBtn: document.getElementById('btn-open-sidebar'),
+                closeBtn: document.getElementById('btn-close-sidebar'),
+                listsContainer: document.getElementById('sidebar-lists'),
+                navBtns: document.querySelectorAll('.nav-btn'),
+                newBtn: document.getElementById('btn-show-new-list')
+            },
+            views: {
+                list: document.getElementById('view-list'),
+                products: document.getElementById('view-products'),
+                stats: document.getElementById('view-stats'),
+                empty: document.getElementById('view-empty-lists')
+            },
+            modals: {
+                newList: document.getElementById('modal-new-list'),
+                categories: document.getElementById('modal-categories'),
+                addPrice: document.getElementById('modal-add-price'),
+                selectCatalog: document.getElementById('modal-select-catalog')
+            },
+            forms: {
+                addItem: document.getElementById('form-add-item'),
+                addProduct: document.getElementById('form-add-product'),
+                newList: document.getElementById('form-new-list'),
+                addCategory: document.getElementById('form-add-category'),
+                addPrice: document.getElementById('form-add-price')
+            },
+            listApp: {
+                title: document.getElementById('current-list-title'),
+                mobileTitle: document.getElementById('mobile-header-title'),
+                pendingList: document.getElementById('list-items-pending'),
+                boughtList: document.getElementById('list-items-bought'),
+                emptyState: document.getElementById('empty-list'),
+                pendingContainer: document.getElementById('container-pending-items'),
+                boughtContainer: document.getElementById('container-bought-items'),
+                progressText: document.getElementById('list-progress-text'),
+                progressTotal: document.getElementById('list-total-text'),
+                progressBar: document.getElementById('list-progress-bar'),
+                deleteBtn: document.getElementById('btn-delete-list'),
+                inputName: document.getElementById('input-item-name'),
+                inputCat: document.getElementById('input-item-category'),
+                inputQtd: document.getElementById('input-item-qtd'),
+                inputUnit: document.getElementById('input-item-unit'),
+                inputPrice: document.getElementById('input-item-price'),
+                suggestions: document.getElementById('product-suggestions'),
+                countPending: document.getElementById('count-pending'),
+                countBought: document.getElementById('count-bought'),
+                btnOpenCatalog: document.getElementById('btn-open-catalog-add'),
+                catalogSelectionList: document.getElementById('list-catalog-selection')
+            },
+            productsApp: {
+                list: document.getElementById('list-products'),
+                inputName: document.getElementById('input-prod-name'),
+                inputCat: document.getElementById('input-prod-category'),
+                inputPrice: document.getElementById('input-prod-price')
+            },
+            statsApp: {
+                totalSpent: document.getElementById('stat-total-spent'),
+                totalItems: document.getElementById('stat-total-items'),
+                categoriesList: document.getElementById('stats-categories')
+            }
+        };
+
+        function loadData() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    const parsed = JSON.parse(stored);
+                    appData = { ...appData, ...parsed };
+                    if(!appData.categories || appData.categories.length === 0) {
+                        appData.categories = [...DEFAULT_CATEGORIES];
+                    }
+                } catch (e) {
+                    console.error("Error parsing local storage", e);
+                }
+            }
+            syncUI();
+        }
+
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+            syncUI();
+        }
+
+        function generateId() {
+            return Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+        }
+
+        function syncUI() {
+            updateCategorySelects();
+            renderManageCategories();
+            renderSidebar();
+            
+            if (appData.activeListId && !appData.lists.find(l => l.id === appData.activeListId)) {
+                appData.activeListId = null;
+            }
+            
+            if (appData.activeListId) {
+                if (state.activeView === 'empty-lists') switchView('list');
+            } else {
+                if (appData.lists.length > 0) {
+                    appData.activeListId = appData.lists[0].id;
+                    switchView('list');
+                } else {
+                    switchView('empty-lists');
+                }
+            }
+
+            if (state.activeView === 'list') renderActiveList();
+            if (state.activeView === 'products') renderProducts();
+            if (state.activeView === 'stats') renderStats();
+        }
+
+        function switchView(viewName) {
+            state.activeView = viewName;
+            Object.values(DOM.views).forEach(el => el.classList.add('hidden'));
+            DOM.sidebar.navBtns.forEach(btn => btn.classList.remove('bg-neutral-800', 'text-white'));
+            document.querySelectorAll('.sidebar-list-item').forEach(el => el.classList.remove('bg-neutral-800', 'text-white'));
+
+            if(viewName === 'list') {
+                DOM.views.list.classList.remove('hidden'); DOM.views.list.classList.add('flex');
+                const listEl = document.getElementById(`nav-list-${appData.activeListId}`);
+                if(listEl) listEl.classList.add('bg-neutral-800', 'text-white');
+                const activeList = appData.lists.find(l => l.id === appData.activeListId);
+                if(activeList) {
+                    DOM.listApp.title.textContent = activeList.name;
+                    DOM.listApp.mobileTitle.textContent = activeList.name;
+                }
+                renderActiveList();
+            } else if (viewName === 'products') {
+                DOM.views.products.classList.remove('hidden'); DOM.views.products.classList.add('flex');
+                document.querySelector('[data-target="products"]').classList.add('bg-neutral-800', 'text-white');
+                DOM.listApp.mobileTitle.textContent = "Catálogo";
+                renderProducts();
+            } else if (viewName === 'stats') {
+                DOM.views.stats.classList.remove('hidden'); DOM.views.stats.classList.add('flex');
+                document.querySelector('[data-target="stats"]').classList.add('bg-neutral-800', 'text-white');
+                DOM.listApp.mobileTitle.textContent = "Estatísticas";
+                renderStats();
+            } else {
+                DOM.views.empty.classList.remove('hidden'); DOM.views.empty.classList.add('flex');
+                DOM.listApp.mobileTitle.textContent = "AnyList";
+            }
+            if(window.closeSidebarOnMobile) window.closeSidebarOnMobile();
+        }
+
+        function selectList(listId) {
+            appData.activeListId = listId;
+            saveData();
+        }
+
+        function renderSidebar() {
+            DOM.sidebar.listsContainer.innerHTML = '';
+            if (appData.lists.length === 0) {
+                DOM.sidebar.listsContainer.innerHTML = '<div class="px-3 py-4 text-xs text-neutral-600 text-center italic">Nenhuma lista. Crie uma acima.</div>';
+                return;
+            }
+            const sorted = [...appData.lists].sort((a, b) => b.createdAt - a.createdAt);
+            sorted.forEach(list => {
+                const btn = document.createElement('button');
+                btn.id = `nav-list-${list.id}`;
+                btn.className = `sidebar-list-item w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors truncate font-medium ${appData.activeListId === list.id && state.activeView === 'list' ? 'bg-neutral-800 text-white' : ''}`;
+                btn.innerHTML = `<i class="ph ph-list-bullets text-lg flex-shrink-0"></i> <span class="truncate">${escapeHtml(list.name)}</span>`;
+                btn.onclick = () => { selectList(list.id); switchView('list'); };
+                DOM.sidebar.listsContainer.appendChild(btn);
+            });
+        }
+
+        const fmtCurrency = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
+
+        function renderActiveList() {
+            if(!appData.activeListId) return;
+            const listItems = appData.items.filter(i => i.listId === appData.activeListId);
+            
+            DOM.listApp.pendingList.innerHTML = '';
+            DOM.listApp.boughtList.innerHTML = '';
+            
+            let totalExpected = 0; let totalBought = 0;
+            const pending = []; const bought = [];
+
+            listItems.forEach(item => {
+                const itemTotal = item.qtd * (item.price || 0);
+                totalExpected += itemTotal;
+                if(item.isBought) { totalBought += itemTotal; bought.push(item); } 
+                else { pending.push(item); }
+            });
+
+            DOM.listApp.progressText.textContent = `${bought.length} de ${listItems.length} itens`;
+            DOM.listApp.progressTotal.innerHTML = `Total: <span class="font-bold text-blue-400">${fmtCurrency(totalBought)}</span> / <span class="text-neutral-500">${fmtCurrency(totalExpected)}</span>`;
+            const pct = listItems.length > 0 ? (bought.length / listItems.length) * 100 : 0;
+            DOM.listApp.progressBar.style.width = `${pct}%`;
+
+            DOM.listApp.countPending.textContent = pending.length;
+            DOM.listApp.countBought.textContent = bought.length;
+
+            DOM.listApp.emptyState.classList.toggle('hidden', listItems.length > 0);
+            DOM.listApp.pendingContainer.classList.toggle('hidden', pending.length === 0);
+            DOM.listApp.boughtContainer.classList.toggle('hidden', bought.length === 0);
+
+            pending.sort((a,b) => b.createdAt - a.createdAt).forEach(item => renderItemRow(item, DOM.listApp.pendingList));
+            bought.sort((a,b) => b.createdAt - a.createdAt).forEach(item => renderItemRow(item, DOM.listApp.boughtList));
+        }
+
+        function renderItemRow(item, container) {
+            const li = document.createElement('li');
+            li.className = `group flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-xl border border-neutral-800 bg-neutral-900/80 shadow-sm transition-all ${item.isBought ? 'grayscale-[30%]' : 'hover:border-neutral-700'}`;
+            
+            const itemTotal = item.price ? (item.qtd * item.price) : 0;
+            let priceHtml = '';
+
+            if (item.price) {
+                priceHtml = `<span class="text-sm font-semibold text-white ${item.isBought ? 'line-through-custom' : ''}">${fmtCurrency(itemTotal)}</span>`;
+            } else {
+                priceHtml = `<button onclick="window.openPriceModal('${item.id}', '${escapeHtml(item.name).replace(/'/g, "\\'")}', false)" class="text-xs font-semibold tracking-wide text-blue-400 bg-blue-500/10 hover:bg-blue-500/20 px-3 py-1.5 rounded-lg transition-colors border border-blue-500/20 whitespace-nowrap">+ Preço</button>`;
+            }
+
+            const unitLabel = item.unit || 'un';
+
+            li.innerHTML = `
+                <div class="flex items-center gap-4 flex-1 overflow-hidden">
+                    <button onclick="window.toggleItemStatus('${item.id}')" class="flex-shrink-0 w-7 h-7 rounded-lg border flex items-center justify-center transition-colors ${item.isBought ? 'bg-blue-600 border-blue-600 text-white shadow-[0_0_12px_rgba(37,99,235,0.4)]' : 'border-neutral-600 text-transparent hover:border-blue-500'}">
+                        <i class="ph ph-check-bold text-sm"></i>
+                    </button>
+                    <div class="flex flex-col truncate">
+                        <span class="font-medium text-white truncate text-[15px] ${item.isBought ? 'line-through-custom' : ''}">${escapeHtml(item.name)}</span>
+                        <div class="flex items-center gap-2 mt-1 text-xs text-neutral-500">
+                            <span class="uppercase tracking-wider font-bold text-[10px] bg-neutral-800 px-1.5 py-0.5 rounded text-neutral-400 border border-neutral-700/50">${escapeHtml(item.category)}</span>
+                            <span>&bull;</span>
+                            <span>${item.qtd} ${unitLabel} ${item.price ? `(${fmtCurrency(item.price)}/${unitLabel})` : ''}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between sm:justify-end gap-4 mt-4 sm:mt-0 ml-11 sm:ml-0">
+                    ${priceHtml}
+                    <button onclick="window.deleteItem('${item.id}')" class="text-neutral-500 hover:text-red-400 p-2 rounded-lg hover:bg-neutral-800 transition-colors sm:opacity-0 group-hover:opacity-100 focus:opacity-100 flex-shrink-0">
+                        <i class="ph ph-trash text-lg"></i>
+                    </button>
+                </div>
+            `;
+            container.appendChild(li);
+        }
+
+        window.toggleItemStatus = (itemId) => {
+            const item = appData.items.find(i => i.id === itemId);
+            if (!item) return;
+
+            if (!item.isBought && (!item.price || item.price <= 0)) {
+                window.openPriceModal(item.id, item.name, true);
+                return;
+            }
+
+            item.isBought = !item.isBought;
+            saveData();
+        };
+
+        window.deleteItem = (itemId) => {
+            appData.items = appData.items.filter(i => i.id !== itemId);
+            saveData();
+            showToast("Item removido");
+        };
+
+        window.openPriceModal = (itemId, itemName, markAsBoughtAfter = false) => {
+            document.getElementById('input-price-item-id').value = itemId;
+            document.getElementById('input-price-action-type').value = markAsBoughtAfter ? 'check' : 'update';
+            document.getElementById('modal-price-item-name').textContent = itemName;
+            document.getElementById('input-price-val').value = '';
+            
+            const btnText = markAsBoughtAfter ? 'Confirmar Compra' : 'Salvar Preço';
+            DOM.forms.addPrice.querySelector('button').textContent = btnText;
+
+            DOM.modals.addPrice.classList.remove('hidden'); DOM.modals.addPrice.classList.add('flex');
+            setTimeout(() => document.getElementById('input-price-val').focus(), 50);
+        };
+
+        function renderProducts() {
+            DOM.productsApp.list.innerHTML = '';
+            if(appData.products.length === 0) {
+                DOM.productsApp.list.innerHTML = '<div class="col-span-full text-neutral-500 text-sm text-center py-12 bg-neutral-900 rounded-xl border border-neutral-800 border-dashed">Nenhum produto cadastrado no catálogo.</div>';
+                return;
+            }
+            const sorted = [...appData.products].sort((a,b) => a.name.localeCompare(b.name));
+
+            sorted.forEach(p => {
+                const li = document.createElement('li');
+                li.className = "flex justify-between items-center p-4 rounded-xl border border-neutral-800 bg-neutral-900 shadow-sm";
+                li.innerHTML = `
+                    <div class="flex flex-col truncate pr-2">
+                        <span class="font-medium text-white truncate text-[15px]">${escapeHtml(p.name)}</span>
+                        <div class="flex items-center gap-2 mt-1 text-xs text-neutral-500">
+                            <span class="uppercase tracking-wider font-bold text-[10px] bg-neutral-800 px-1.5 py-0.5 rounded border border-neutral-700/50">${escapeHtml(p.defaultCategory)}</span>
+                            ${p.defaultPrice ? `<span>&bull;</span><span>${fmtCurrency(p.defaultPrice)} un.</span>` : ''}
+                        </div>
+                    </div>
+                    <button onclick="window.deleteProduct('${p.id}')" class="text-neutral-500 hover:text-red-400 p-2 rounded-lg hover:bg-neutral-800 transition-colors flex-shrink-0"><i class="ph ph-trash text-lg"></i></button>
+                `;
+                DOM.productsApp.list.appendChild(li);
+            });
+        }
+
+        window.deleteProduct = (id) => {
+            appData.products = appData.products.filter(p => p.id !== id);
+            saveData();
+            showToast("Produto removido");
+        }
+
+        function renderStats() {
+            let totalSpent = 0;
+            const byCategory = {};
+            let countBought = 0;
+
+            appData.items.forEach(i => {
+                if(i.isBought && i.price) {
+                    const itemTot = i.qtd * i.price;
+                    totalSpent += itemTot;
+                    countBought++;
+                    byCategory[i.category] = (byCategory[i.category] || 0) + itemTot;
+                }
+            });
+
+            DOM.statsApp.totalSpent.textContent = fmtCurrency(totalSpent);
+            DOM.statsApp.totalItems.textContent = countBought;
+
+            DOM.statsApp.categoriesList.innerHTML = '';
+            if(Object.keys(byCategory).length === 0) {
+                DOM.statsApp.categoriesList.innerHTML = '<div class="text-sm text-neutral-500 py-8 text-center bg-neutral-950 rounded-xl border border-neutral-800 border-dashed">Nenhuma compra concluída registrada ainda.</div>';
+                return;
+            }
+
+            const max = Math.max(...Object.values(byCategory));
+            Object.entries(byCategory)
+                .sort((a,b) => b[1] - a[1])
+                .forEach(([cat, val]) => {
+                    const w = max > 0 ? (val / max) * 100 : 0;
+                    const el = document.createElement('div');
+                    el.className = "flex flex-col gap-1.5";
+                    el.innerHTML = `
+                        <div class="flex justify-between text-sm items-end">
+                            <span class="font-semibold text-neutral-300 uppercase tracking-wider text-[10px]">${escapeHtml(cat)}</span>
+                            <span class="font-bold text-white text-sm">${fmtCurrency(val)}</span>
+                        </div>
+                        <div class="h-2.5 w-full bg-neutral-950 border border-neutral-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full" style="width: ${w}%"></div>
+                        </div>
+                    `;
+                    DOM.statsApp.categoriesList.appendChild(el);
+                });
+        }
+
+        function setupEventListeners() {
+            DOM.sidebar.navBtns.forEach(btn => btn.addEventListener('click', (e) => switchView(e.currentTarget.dataset.target)));
+            
+            document.querySelectorAll('.btn-trigger-new-list').forEach(btn => {
+                btn.addEventListener('click', () => { 
+                    DOM.modals.newList.classList.remove('hidden'); DOM.modals.newList.classList.add('flex'); 
+                    setTimeout(() => document.getElementById('input-new-list-name').focus(), 50); 
+                });
+            });
+            DOM.sidebar.newBtn.addEventListener('click', () => {
+                DOM.modals.newList.classList.remove('hidden'); DOM.modals.newList.classList.add('flex'); 
+                setTimeout(() => document.getElementById('input-new-list-name').focus(), 50);
+            });
+            
+            DOM.sidebar.openBtn.addEventListener('click', () => {
+                DOM.sidebar.self.classList.add('open');
+                DOM.sidebar.overlay.classList.remove('hidden');
+                setTimeout(() => DOM.sidebar.overlay.classList.remove('opacity-0'), 10);
+            });
+            window.closeSidebarOnMobile = () => {
+                DOM.sidebar.self.classList.remove('open');
+                DOM.sidebar.overlay.classList.add('opacity-0');
+                setTimeout(() => DOM.sidebar.overlay.classList.add('hidden'), 300);
+            };
+            DOM.sidebar.closeBtn.addEventListener('click', window.closeSidebarOnMobile);
+            DOM.sidebar.overlay.addEventListener('click', window.closeSidebarOnMobile);
+
+            document.querySelectorAll('.btn-close-modal').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const modal = e.currentTarget.closest('.fixed');
+                    modal.classList.add('hidden'); modal.classList.remove('flex');
+                });
+            });
+
+            DOM.forms.newList.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('input-new-list-name').value.trim();
+                if(!name) return;
+                
+                const newList = { id: generateId(), name, createdAt: Date.now() };
+                appData.lists.push(newList);
+                
+                document.getElementById('input-new-list-name').value = '';
+                DOM.modals.newList.classList.add('hidden'); DOM.modals.newList.classList.remove('flex');
+                
+                appData.activeListId = newList.id;
+                saveData();
+                showToast("Lista criada");
+            });
+
+            DOM.listApp.deleteBtn.addEventListener('click', () => {
+                if(!appData.activeListId) return;
+                if (confirm('Tem certeza que deseja excluir esta lista inteira?')) {
+                    appData.lists = appData.lists.filter(l => l.id !== appData.activeListId);
+                    appData.items = appData.items.filter(i => i.listId !== appData.activeListId);
+                    appData.activeListId = null;
+                    saveData();
+                    showToast("Lista apagada");
+                }
+            });
+
+            DOM.forms.addItem.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if(!appData.activeListId) return;
+                
+                const name = DOM.listApp.inputName.value.trim();
+                const category = DOM.listApp.inputCat.value;
+                const qtd = parseFloat(DOM.listApp.inputQtd.value) || 1;
+                const unit = DOM.listApp.inputUnit.value;
+                const priceVal = DOM.listApp.inputPrice.value;
+                const price = priceVal !== "" ? parseFloat(priceVal) : null;
+
+                if(!name || !category) return;
+
+                // 1. Check if product already exists in catalog (case insensitive), if not, add it automatically!
+                const existingProd = appData.products.find(p => p.name.toLowerCase() === name.toLowerCase());
+                if (!existingProd) {
+                    appData.products.push({
+                        id: generateId(),
+                        name: name,
+                        defaultCategory: category,
+                        defaultPrice: price,
+                        createdAt: Date.now()
+                    });
+                }
+
+                // 2. Add item to current list
+                const newItem = {
+                    id: generateId(),
+                    listId: appData.activeListId,
+                    name, category, qtd, unit, price,
+                    isBought: false,
+                    createdAt: Date.now()
+                };
+
+                appData.items.push(newItem);
+                saveData();
+
+                DOM.listApp.inputName.value = ''; 
+                DOM.listApp.inputQtd.value = '1'; 
+                DOM.listApp.inputPrice.value = '';
+                DOM.listApp.inputName.focus(); 
+                DOM.listApp.suggestions.classList.add('hidden');
+                showToast("Item adicionado e salvo no Catálogo!");
+            });
+
+            DOM.forms.addPrice.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const itemId = document.getElementById('input-price-item-id').value;
+                const actionType = document.getElementById('input-price-action-type').value;
+                const price = parseFloat(document.getElementById('input-price-val').value);
+                
+                if(isNaN(price) || price < 0) return;
+
+                const item = appData.items.find(i => i.id === itemId);
+                if(item) {
+                    item.price = price;
+                    if(actionType === 'check') item.isBought = true;
+                    saveData();
+                    showToast(actionType === 'check' ? "Compra confirmada!" : "Preço atualizado!");
+                }
+
+                DOM.modals.addPrice.classList.add('hidden'); DOM.modals.addPrice.classList.remove('flex');
+            });
+
+            DOM.listApp.inputName.addEventListener('input', (e) => {
+                const val = e.target.value.toLowerCase().trim();
+                if(!val) { DOM.listApp.suggestions.classList.add('hidden'); return; }
+                const matches = appData.products.filter(p => p.name.toLowerCase().includes(val));
+                if(matches.length === 0) { DOM.listApp.suggestions.classList.add('hidden'); return; }
+
+                DOM.listApp.suggestions.innerHTML = '';
+                matches.forEach(m => {
+                    const li = document.createElement('li');
+                    li.className = "px-4 py-2.5 hover:bg-neutral-700 cursor-pointer text-sm text-white border-b border-neutral-700/50 last:border-0 font-medium transition-colors flex justify-between";
+                    li.innerHTML = `<span>${escapeHtml(m.name)}</span> <span class="text-xs text-neutral-400">${escapeHtml(m.defaultCategory)}</span>`;
+                    li.onclick = () => {
+                        DOM.listApp.inputName.value = m.name; 
+                        DOM.listApp.inputCat.value = m.defaultCategory;
+                        if(m.defaultPrice) DOM.listApp.inputPrice.value = m.defaultPrice;
+                        DOM.listApp.suggestions.classList.add('hidden'); DOM.listApp.inputQtd.focus();
+                    };
+                    DOM.listApp.suggestions.appendChild(li);
+                });
+                DOM.listApp.suggestions.classList.remove('hidden');
+            });
+            
+            document.addEventListener('click', (e) => {
+                if(!DOM.listApp.inputName.contains(e.target) && !DOM.listApp.suggestions.contains(e.target)) {
+                    DOM.listApp.suggestions.classList.add('hidden');
+                }
+            });
+
+            if (DOM.listApp.btnOpenCatalog) {
+                DOM.listApp.btnOpenCatalog.addEventListener('click', () => {
+                    renderCatalogSelection();
+                    DOM.modals.selectCatalog.classList.remove('hidden'); 
+                    DOM.modals.selectCatalog.classList.add('flex');
+                });
+            }
+
+            DOM.forms.addProduct.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = DOM.productsApp.inputName.value.trim();
+                const defaultCategory = DOM.productsApp.inputCat.value;
+                const pVal = DOM.productsApp.inputPrice.value;
+                const defaultPrice = pVal ? parseFloat(pVal) : null;
+                
+                appData.products.push({ id: generateId(), name, defaultCategory, defaultPrice, createdAt: Date.now() });
+                saveData();
+                DOM.forms.addProduct.reset(); 
+                showToast("Produto salvo no catálogo!");
+            });
+
+            document.getElementById('btn-manage-cat-inline').addEventListener('click', () => {
+                DOM.modals.categories.classList.remove('hidden'); DOM.modals.categories.classList.add('flex');
+                setTimeout(() => document.getElementById('input-new-category').focus(), 50);
+            });
+            
+            DOM.forms.addCategory.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newCat = document.getElementById('input-new-category').value.trim();
+                if(!newCat || appData.categories.map(c=>c.toLowerCase()).includes(newCat.toLowerCase())) {
+                    showToast("Categoria inválida ou existente");
+                    return;
+                }
+                appData.categories.push(newCat);
+                saveData();
+                document.getElementById('input-new-category').value = '';
+            });
+
+            window.deleteCategory = (idx) => {
+                const cat = appData.categories[idx];
+                if(appData.items.some(i => i.category === cat) || appData.products.some(p => p.defaultCategory === cat)) {
+                    showToast("Esta categoria está em uso!"); return;
+                }
+                appData.categories.splice(idx, 1);
+                saveData();
+            };
+        }
+
+        function updateCategorySelects() {
+            const selects = [DOM.listApp.inputCat, DOM.productsApp.inputCat];
+            selects.forEach(select => {
+                if(!select) return;
+                const currentVal = select.value;
+                select.innerHTML = '';
+                appData.categories.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat; opt.textContent = cat;
+                    select.appendChild(opt);
+                });
+                if(appData.categories.includes(currentVal)) select.value = currentVal;
+            });
+        }
+
+        function renderManageCategories() {
+            const list = document.getElementById('list-categories-manage');
+            if(!list) return;
+            list.innerHTML = '';
+            appData.categories.forEach((cat, idx) => {
+                const li = document.createElement('li');
+                li.className = "flex justify-between items-center px-4 py-3 bg-neutral-950 rounded-xl border border-neutral-800 text-sm text-white font-medium";
+                li.innerHTML = `<span>${escapeHtml(cat)}</span> <button onclick="window.deleteCategory(${idx})" class="text-neutral-500 hover:text-red-400 bg-neutral-900 p-1.5 rounded-lg transition-colors"><i class="ph ph-trash text-lg"></i></button>`;
+                list.appendChild(li);
+            });
+        }
+
+        function renderCatalogSelection() {
+            const list = DOM.listApp.catalogSelectionList;
+            if(!list) return;
+            list.innerHTML = '';
+            
+            if(appData.products.length === 0) {
+                list.innerHTML = '<div class="text-neutral-500 text-sm text-center py-8 bg-neutral-950 rounded-xl border border-neutral-800 border-dashed">Catálogo vazio. Cadastre novos produtos na aba Catálogo.</div>';
+                return;
+            }
+
+            const sorted = [...appData.products].sort((a,b) => a.name.localeCompare(b.name));
+            
+            sorted.forEach(p => {
+                const li = document.createElement('li');
+                li.className = "flex justify-between items-center px-4 py-3 bg-neutral-950 hover:bg-neutral-800 rounded-xl border border-neutral-800 cursor-pointer transition-colors shadow-sm group";
+                li.innerHTML = `
+                    <div class="flex flex-col truncate pr-2">
+                        <span class="font-medium text-white truncate text-[15px] group-hover:text-blue-400 transition-colors">${escapeHtml(p.name)}</span>
+                        <div class="flex items-center gap-2 mt-1 text-xs text-neutral-500">
+                            <span class="uppercase tracking-wider font-bold text-[10px] bg-neutral-900 px-1.5 py-0.5 rounded border border-neutral-700/50">${escapeHtml(p.defaultCategory)}</span>
+                            ${p.defaultPrice ? `<span>&bull;</span><span>${fmtCurrency(p.defaultPrice)} un.</span>` : ''}
+                        </div>
+                    </div>
+                    <i class="ph ph-plus-circle text-xl text-neutral-500 group-hover:text-blue-400"></i>
+                `;
+                li.onclick = () => {
+                    DOM.listApp.inputName.value = p.name;
+                    DOM.listApp.inputCat.value = p.defaultCategory;
+                    DOM.listApp.inputPrice.value = p.defaultPrice || '';
+                    DOM.modals.selectCatalog.classList.add('hidden'); 
+                    DOM.modals.selectCatalog.classList.remove('flex');
+                    DOM.listApp.inputQtd.focus();
+                };
+                list.appendChild(li);
+            });
+        }
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').textContent = msg;
+            const icon = document.getElementById('toast-icon');
+            
+            if(isError) {
+                icon.className = "ph ph-warning-circle text-red-400 text-xl";
+            } else {
+                icon.className = "ph ph-check-circle text-emerald-400 text-xl";
+            }
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => toast.classList.add('translate-y-24', 'opacity-0'), 3000);
+        }
+
+        function escapeHtml(unsafe) {
+            if(typeof unsafe !== 'string') return unsafe;
+            return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        setupEventListeners();
+        loadData();
+    </script>
+</body>
+</html>
