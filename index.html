@@ -115,11 +115,41 @@
                 
                 <!-- VIEW: LIST -->
                 <section id="view-list" class="view-section flex flex-col gap-6 hidden">
-                    <div class="flex justify-between items-center hidden md:flex">
-                        <h2 id="current-list-title" class="text-2xl font-bold text-white tracking-tight truncate max-w-md">Lista</h2>
-                        <button id="btn-delete-list" class="text-neutral-500 hover:text-red-400 text-sm flex items-center gap-1.5 transition-colors bg-neutral-900 px-3 py-1.5 rounded-lg border border-neutral-800 focus:outline-none">
-                            <i class="ph ph-trash"></i> Apagar
-                        </button>
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 hidden md:flex">
+                        <div class="flex flex-col gap-1">
+                            <h2 id="current-list-title" class="text-2xl font-bold text-white tracking-tight truncate max-w-md">Lista</h2>
+                            <div class="flex items-center gap-2 text-xs text-neutral-400">
+                                <span id="current-list-recurrence-badge" class="hidden bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded font-medium flex items-center gap-1"><i class="ph ph-arrows-clockwise"></i> Recorrente Mensal</span>
+                                <div class="flex items-center gap-1 bg-neutral-900 border border-neutral-800 px-2 py-1 rounded-lg">
+                                    <i class="ph ph-calendar text-neutral-400"></i>
+                                    <input type="date" id="input-list-date" class="bg-transparent text-white text-xs focus:outline-none cursor-pointer">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button id="btn-edit-list-settings" class="text-neutral-400 hover:text-white text-sm flex items-center gap-1.5 transition-colors bg-neutral-900 px-3 py-1.5 rounded-lg border border-neutral-800 focus:outline-none">
+                                <i class="ph ph-gear"></i> Configurações
+                            </button>
+                            <button id="btn-delete-list" class="text-neutral-500 hover:text-red-400 text-sm flex items-center gap-1.5 transition-colors bg-neutral-900 px-3 py-1.5 rounded-lg border border-neutral-800 focus:outline-none">
+                                <i class="ph ph-trash"></i> Apagar
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Mobile metadata row -->
+                    <div class="md:hidden flex flex-wrap items-center justify-between gap-3 bg-neutral-900 border border-neutral-800 p-3 rounded-xl">
+                        <div class="flex items-center gap-2 text-xs text-neutral-400">
+                            <i class="ph ph-calendar text-neutral-400"></i>
+                            <input type="date" id="input-list-date-mobile" class="bg-transparent text-white text-xs focus:outline-none cursor-pointer">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button id="btn-edit-list-settings-mobile" class="text-neutral-400 hover:text-white text-xs bg-neutral-800 px-2.5 py-1.5 rounded-lg border border-neutral-700 flex items-center gap-1">
+                                <i class="ph ph-gear"></i> Config
+                            </button>
+                            <button id="btn-delete-list-mobile" class="text-neutral-500 hover:text-red-400 text-xs bg-neutral-800 px-2.5 py-1.5 rounded-lg border border-neutral-700 flex items-center gap-1">
+                                <i class="ph ph-trash"></i> Apagar
+                            </button>
+                        </div>
                     </div>
 
                     <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-4 md:p-5 shadow-sm">
@@ -130,7 +160,7 @@
                                         <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Item</label>
                                         <button type="button" id="btn-open-catalog-add" class="text-[10px] text-blue-400 hover:text-blue-300 uppercase font-semibold flex items-center gap-1"><i class="ph ph-book-open"></i> Ver Catálogo</button>
                                     </div>
-                                    <input type="text" id="input-item-name" required placeholder="Ex: Maçã Fuji ou Arroz" autocomplete="off"
+                                    <input type="text" id="input-item-name" required placeholder="Ex: Maçã Fuji ou Conta de Luz" autocomplete="off"
                                         class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-neutral-500 transition-all">
                                     <ul id="product-suggestions" class="absolute top-[105%] left-0 right-0 bg-neutral-800 border border-neutral-700 rounded-lg shadow-xl max-h-48 overflow-y-auto hidden z-50 py-1"></ul>
                                 </div>
@@ -243,14 +273,21 @@
 
                 <!-- VIEW: STATISTICS -->
                 <section id="view-stats" class="view-section flex flex-col gap-6 hidden">
-                    <div>
-                        <h2 class="text-2xl font-bold text-white tracking-tight">Estatísticas</h2>
-                        <p class="text-sm text-neutral-400 mt-1">Gastos baseados nos itens <strong class="text-white">já comprados</strong> de todas as listas.</p>
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-white tracking-tight">Estatísticas</h2>
+                            <p class="text-sm text-neutral-400 mt-1">Gastos baseados nos itens <strong class="text-white">já comprados</strong>.</p>
+                        </div>
+                        <div class="flex items-center gap-2 bg-neutral-900 border border-neutral-800 px-3 py-2 rounded-xl">
+                            <i class="ph ph-calendar-blank text-neutral-400"></i>
+                            <input type="month" id="stats-month-filter" class="bg-transparent text-white text-xs focus:outline-none cursor-pointer">
+                            <button id="btn-clear-month-filter" class="text-neutral-500 hover:text-white text-xs ml-1 px-1.5 py-0.5 rounded bg-neutral-800 hidden" title="Limpar Filtro">Todos</button>
+                        </div>
                     </div>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-sm flex flex-col items-center sm:items-start">
-                            <span class="text-xs font-bold text-neutral-500 uppercase tracking-widest mb-2">Gasto Total</span>
+                            <span class="text-xs font-bold text-neutral-500 uppercase tracking-widest mb-2">Gasto no Período</span>
                             <span id="stat-total-spent" class="text-4xl font-bold text-white tracking-tight">R$ 0,00</span>
                         </div>
                         <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-sm flex flex-col items-center sm:items-start">
@@ -283,20 +320,33 @@
         </main>
     </div>
 
-    <!-- MODAL: NEW LIST -->
+    <!-- MODAL: NEW / EDIT LIST -->
     <div id="modal-new-list" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex-col items-center justify-center z-50 p-4 transition-opacity">
         <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-sm shadow-2xl p-6">
             <div class="flex justify-between items-center mb-5">
-                <h3 class="font-semibold text-white text-lg tracking-tight">Criar Nova Lista</h3>
+                <h3 id="modal-list-title-header" class="font-semibold text-white text-lg tracking-tight">Criar Nova Lista</h3>
                 <button class="btn-close-modal text-neutral-500 hover:text-white p-1 rounded-md hover:bg-neutral-800 transition-colors"><i class="ph ph-x"></i></button>
             </div>
             <form id="form-new-list" class="flex flex-col gap-4">
+                <input type="hidden" id="input-edit-list-id">
                 <div class="flex flex-col gap-1.5">
                     <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Nome da Lista</label>
-                    <input type="text" id="input-new-list-name" required placeholder="Ex: Compras do Mês" autocomplete="off"
+                    <input type="text" id="input-new-list-name" required placeholder="Ex: Contas, Mercado..." autocomplete="off"
                         class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-neutral-500 transition-all">
                 </div>
-                <button type="submit" class="w-full bg-white text-black hover:bg-neutral-200 px-4 py-3 rounded-lg text-sm font-semibold transition-colors mt-2">
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Data da Lista</label>
+                    <input type="date" id="input-new-list-date" required
+                        class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-neutral-500 transition-all cursor-pointer">
+                </div>
+                <div class="flex items-center gap-3 pt-2 bg-neutral-950/50 p-3 rounded-xl border border-neutral-800/60">
+                    <input type="checkbox" id="input-new-list-recurring" class="w-4 h-4 rounded bg-neutral-900 border-neutral-700 text-blue-600 focus:ring-0 cursor-pointer">
+                    <div class="flex flex-col cursor-pointer" onclick="document.getElementById('input-new-list-recurring').click()">
+                        <label class="text-xs font-semibold text-white cursor-pointer">Recorrente Mensal</label>
+                        <span class="text-[11px] text-neutral-500">Reinicia os checks automaticamente todo mês</span>
+                    </div>
+                </div>
+                <button type="submit" id="btn-submit-list-modal" class="w-full bg-white text-black hover:bg-neutral-200 px-4 py-3 rounded-lg text-sm font-semibold transition-colors mt-2">
                     Criar Lista
                 </button>
             </form>
@@ -370,8 +420,8 @@
     </div>
 
     <script>
-        const DEFAULT_CATEGORIES = ['Mercado', 'Benfica', 'Mercado Livre', 'Contas', 'Assinaturas'];
-        const STORAGE_KEY = 'anylist_local_data_v2';
+        const DEFAULT_CATEGORIES = ['Mercado', 'Mercado Livre', 'Contas', 'Assinaturas'];
+        const STORAGE_KEY = 'anylist_local_data_v3';
 
         let appData = {
             categories: [...DEFAULT_CATEGORIES],
@@ -381,7 +431,12 @@
             activeListId: null
         };
 
-        let state = { activeView: 'empty-lists' };
+        let state = { 
+            activeView: 'empty-lists',
+            statsMonthFilter: '' // format YYYY-MM
+        };
+
+        const getTodayDateStr = () => new Date().toISOString().slice(0, 10);
 
         const DOM = {
             sidebar: {
@@ -415,6 +470,11 @@
             listApp: {
                 title: document.getElementById('current-list-title'),
                 mobileTitle: document.getElementById('mobile-header-title'),
+                recurrenceBadge: document.getElementById('current-list-recurrence-badge'),
+                inputDate: document.getElementById('input-list-date'),
+                inputDateMobile: document.getElementById('input-list-date-mobile'),
+                editSettingsBtn: document.getElementById('btn-edit-list-settings'),
+                editSettingsBtnMobile: document.getElementById('btn-edit-list-settings-mobile'),
                 pendingList: document.getElementById('list-items-pending'),
                 boughtList: document.getElementById('list-items-bought'),
                 emptyState: document.getElementById('empty-list'),
@@ -424,6 +484,7 @@
                 progressTotal: document.getElementById('list-total-text'),
                 progressBar: document.getElementById('list-progress-bar'),
                 deleteBtn: document.getElementById('btn-delete-list'),
+                deleteBtnMobile: document.getElementById('btn-delete-list-mobile'),
                 inputName: document.getElementById('input-item-name'),
                 inputCat: document.getElementById('input-item-category'),
                 inputQtd: document.getElementById('input-item-qtd'),
@@ -444,7 +505,9 @@
             statsApp: {
                 totalSpent: document.getElementById('stat-total-spent'),
                 totalItems: document.getElementById('stat-total-items'),
-                categoriesList: document.getElementById('stats-categories')
+                categoriesList: document.getElementById('stats-categories'),
+                monthFilter: document.getElementById('stats-month-filter'),
+                clearMonthFilterBtn: document.getElementById('btn-clear-month-filter')
             }
         };
 
@@ -461,11 +524,43 @@
                     console.error("Error parsing local storage", e);
                 }
             }
+            
+            // Check recurring monthly lists
+            checkRecurringLists();
             syncUI();
         }
 
-        function saveData() {
+        function checkRecurringLists() {
+            const currentMonthStr = new Date().toISOString().slice(0, 7); // 'YYYY-MM'
+            let updated = false;
+
+            appData.lists.forEach(list => {
+                if (list.isRecurring) {
+                    if (!list.lastResetMonth || list.lastResetMonth < currentMonthStr) {
+                        // Reset all items in this list to unbought
+                        appData.items.forEach(item => {
+                            if (item.listId === list.id) {
+                                item.isBought = false;
+                                item.boughtAt = null;
+                            }
+                        });
+                        list.lastResetMonth = currentMonthStr;
+                        updated = true;
+                    }
+                }
+            });
+
+            if (updated) {
+                saveDataToStorage();
+            }
+        }
+
+        function saveDataToStorage() {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+        }
+
+        function saveData() {
+            saveDataToStorage();
             syncUI();
         }
 
@@ -512,6 +607,9 @@
                 if(activeList) {
                     DOM.listApp.title.textContent = activeList.name;
                     DOM.listApp.mobileTitle.textContent = activeList.name;
+                    DOM.listApp.inputDate.value = activeList.date || getTodayDateStr();
+                    DOM.listApp.inputDateMobile.value = activeList.date || getTodayDateStr();
+                    DOM.listApp.recurrenceBadge.classList.toggle('hidden', !activeList.isRecurring);
                 }
                 renderActiveList();
             } else if (viewName === 'products') {
@@ -542,12 +640,18 @@
                 DOM.sidebar.listsContainer.innerHTML = '<div class="px-3 py-4 text-xs text-neutral-600 text-center italic">Nenhuma lista. Crie uma acima.</div>';
                 return;
             }
-            const sorted = [...appData.lists].sort((a, b) => b.createdAt - a.createdAt);
+            const sorted = [...appData.lists].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
             sorted.forEach(list => {
                 const btn = document.createElement('button');
                 btn.id = `nav-list-${list.id}`;
-                btn.className = `sidebar-list-item w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors truncate font-medium ${appData.activeListId === list.id && state.activeView === 'list' ? 'bg-neutral-800 text-white' : ''}`;
-                btn.innerHTML = `<i class="ph ph-list-bullets text-lg flex-shrink-0"></i> <span class="truncate">${escapeHtml(list.name)}</span>`;
+                btn.className = `sidebar-list-item w-full text-left px-3 py-2.5 rounded-lg flex items-center justify-between text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors truncate font-medium ${appData.activeListId === list.id && state.activeView === 'list' ? 'bg-neutral-800 text-white' : ''}`;
+                btn.innerHTML = `
+                    <div class="flex items-center gap-3 truncate">
+                        <i class="ph ph-list-bullets text-lg flex-shrink-0"></i> 
+                        <span class="truncate">${escapeHtml(list.name)}</span>
+                    </div>
+                    ${list.isRecurring ? '<i class="ph ph-arrows-clockwise text-xs text-blue-400 flex-shrink-0" title="Recorrente Mensal"></i>' : ''}
+                `;
                 btn.onclick = () => { selectList(list.id); switchView('list'); };
                 DOM.sidebar.listsContainer.appendChild(btn);
             });
@@ -637,6 +741,7 @@
             }
 
             item.isBought = !item.isBought;
+            item.boughtAt = item.isBought ? Date.now() : null;
             saveData();
         };
 
@@ -695,8 +800,25 @@
             const byCategory = {};
             let countBought = 0;
 
+            const monthFilter = state.statsMonthFilter; // 'YYYY-MM' or ''
+
             appData.items.forEach(i => {
                 if(i.isBought && i.price) {
+                    // Determine date to check against month filter
+                    let dateToCheck = null;
+                    if(i.boughtAt) {
+                        dateToCheck = new Date(i.boughtAt).toISOString().slice(0, 7);
+                    } else {
+                        const list = appData.lists.find(l => l.id === i.listId);
+                        if(list && list.date) {
+                            dateToCheck = list.date.slice(0, 7);
+                        }
+                    }
+
+                    if(monthFilter && dateToCheck !== monthFilter) {
+                        return; // skip if doesn't match month filter
+                    }
+
                     const itemTot = i.qtd * i.price;
                     totalSpent += itemTot;
                     countBought++;
@@ -706,10 +828,11 @@
 
             DOM.statsApp.totalSpent.textContent = fmtCurrency(totalSpent);
             DOM.statsApp.totalItems.textContent = countBought;
+            DOM.statsApp.clearMonthFilterBtn.classList.toggle('hidden', !monthFilter);
 
             DOM.statsApp.categoriesList.innerHTML = '';
             if(Object.keys(byCategory).length === 0) {
-                DOM.statsApp.categoriesList.innerHTML = '<div class="text-sm text-neutral-500 py-8 text-center bg-neutral-950 rounded-xl border border-neutral-800 border-dashed">Nenhuma compra concluída registrada ainda.</div>';
+                DOM.statsApp.categoriesList.innerHTML = '<div class="text-sm text-neutral-500 py-8 text-center bg-neutral-950 rounded-xl border border-neutral-800 border-dashed">Nenhuma compra concluída encontrada para este período.</div>';
                 return;
             }
 
@@ -736,17 +859,69 @@
         function setupEventListeners() {
             DOM.sidebar.navBtns.forEach(btn => btn.addEventListener('click', (e) => switchView(e.currentTarget.dataset.target)));
             
+            const openNewListModal = (listToEdit = null) => {
+                const modal = DOM.modals.newList;
+                const titleHeader = document.getElementById('modal-list-title-header');
+                const submitBtn = document.getElementById('btn-submit-list-modal');
+                const nameInput = document.getElementById('input-new-list-name');
+                const dateInput = document.getElementById('input-new-list-date');
+                const recurringInput = document.getElementById('input-new-list-recurring');
+                const editIdInput = document.getElementById('input-edit-list-id');
+
+                if (listToEdit) {
+                    titleHeader.textContent = "Editar Lista";
+                    submitBtn.textContent = "Salvar Alterações";
+                    nameInput.value = listToEdit.name;
+                    dateInput.value = listToEdit.date || getTodayDateStr();
+                    recurringInput.checked = !!listToEdit.isRecurring;
+                    editIdInput.value = listToEdit.id;
+                } else {
+                    titleHeader.textContent = "Criar Nova Lista";
+                    submitBtn.textContent = "Criar Lista";
+                    nameInput.value = "";
+                    dateInput.value = getTodayDateStr();
+                    recurringInput.checked = false;
+                    editIdInput.value = "";
+                }
+
+                modal.classList.remove('hidden'); modal.classList.add('flex');
+                setTimeout(() => nameInput.focus(), 50);
+            };
+
             document.querySelectorAll('.btn-trigger-new-list').forEach(btn => {
-                btn.addEventListener('click', () => { 
-                    DOM.modals.newList.classList.remove('hidden'); DOM.modals.newList.classList.add('flex'); 
-                    setTimeout(() => document.getElementById('input-new-list-name').focus(), 50); 
+                btn.addEventListener('click', () => openNewListModal());
+            });
+            DOM.sidebar.newBtn.addEventListener('click', () => openNewListModal());
+
+            if(DOM.listApp.editSettingsBtn) {
+                DOM.listApp.editSettingsBtn.addEventListener('click', () => {
+                    const list = appData.lists.find(l => l.id === appData.activeListId);
+                    if(list) openNewListModal(list);
                 });
-            });
-            DOM.sidebar.newBtn.addEventListener('click', () => {
-                DOM.modals.newList.classList.remove('hidden'); DOM.modals.newList.classList.add('flex'); 
-                setTimeout(() => document.getElementById('input-new-list-name').focus(), 50);
-            });
-            
+            }
+            if(DOM.listApp.editSettingsBtnMobile) {
+                DOM.listApp.editSettingsBtnMobile.addEventListener('click', () => {
+                    const list = appData.lists.find(l => l.id === appData.activeListId);
+                    if(list) openNewListModal(list);
+                });
+            }
+
+            // Date inputs change handlers for active list
+            const handleDateChange = (e) => {
+                if(!appData.activeListId) return;
+                const list = appData.lists.find(l => l.id === appData.activeListId);
+                if(list) {
+                    list.date = e.target.value;
+                    DOM.listApp.inputDate.value = list.date;
+                    DOM.listApp.inputDateMobile.value = list.date;
+                    saveDataToStorage();
+                    renderSidebar();
+                    showToast("Data da lista atualizada");
+                }
+            };
+            DOM.listApp.inputDate.addEventListener('change', handleDateChange);
+            DOM.listApp.inputDateMobile.addEventListener('change', handleDateChange);
+
             DOM.sidebar.openBtn.addEventListener('click', () => {
                 DOM.sidebar.self.classList.add('open');
                 DOM.sidebar.overlay.classList.remove('hidden');
@@ -770,20 +945,41 @@
             DOM.forms.newList.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const name = document.getElementById('input-new-list-name').value.trim();
+                const date = document.getElementById('input-new-list-date').value || getTodayDateStr();
+                const isRecurring = document.getElementById('input-new-list-recurring').checked;
+                const editId = document.getElementById('input-edit-list-id').value;
+
                 if(!name) return;
                 
-                const newList = { id: generateId(), name, createdAt: Date.now() };
-                appData.lists.push(newList);
-                
-                document.getElementById('input-new-list-name').value = '';
-                DOM.modals.newList.classList.add('hidden'); DOM.modals.newList.classList.remove('flex');
-                
-                appData.activeListId = newList.id;
-                saveData();
-                showToast("Lista criada");
+                if (editId) {
+                    const list = appData.lists.find(l => l.id === editId);
+                    if(list) {
+                        list.name = name;
+                        list.date = date;
+                        list.isRecurring = isRecurring;
+                    }
+                    DOM.modals.newList.classList.add('hidden'); DOM.modals.newList.classList.remove('flex');
+                    saveData();
+                    showToast("Lista atualizada");
+                } else {
+                    const newList = { 
+                        id: generateId(), 
+                        name, 
+                        date, 
+                        isRecurring, 
+                        createdAt: Date.now(),
+                        lastResetMonth: isRecurring ? date.slice(0, 7) : null 
+                    };
+                    appData.lists.push(newList);
+                    
+                    DOM.modals.newList.classList.add('hidden'); DOM.modals.newList.classList.remove('flex');
+                    appData.activeListId = newList.id;
+                    saveData();
+                    showToast("Lista criada");
+                }
             });
 
-            DOM.listApp.deleteBtn.addEventListener('click', () => {
+            const deleteCurrentList = () => {
                 if(!appData.activeListId) return;
                 if (confirm('Tem certeza que deseja excluir esta lista inteira?')) {
                     appData.lists = appData.lists.filter(l => l.id !== appData.activeListId);
@@ -792,7 +988,9 @@
                     saveData();
                     showToast("Lista apagada");
                 }
-            });
+            };
+            DOM.listApp.deleteBtn.addEventListener('click', deleteCurrentList);
+            DOM.listApp.deleteBtnMobile.addEventListener('click', deleteCurrentList);
 
             DOM.forms.addItem.addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -825,6 +1023,7 @@
                     listId: appData.activeListId,
                     name, category, qtd, unit, price,
                     isBought: false,
+                    boughtAt: null,
                     createdAt: Date.now()
                 };
 
@@ -850,7 +1049,10 @@
                 const item = appData.items.find(i => i.id === itemId);
                 if(item) {
                     item.price = price;
-                    if(actionType === 'check') item.isBought = true;
+                    if(actionType === 'check') {
+                        item.isBought = true;
+                        item.boughtAt = Date.now();
+                    }
                     saveData();
                     showToast(actionType === 'check' ? "Compra confirmada!" : "Preço atualizado!");
                 }
@@ -905,6 +1107,17 @@
                 saveData();
                 DOM.forms.addProduct.reset(); 
                 showToast("Produto salvo no catálogo!");
+            });
+
+            // Statistics month filter listeners
+            DOM.statsApp.monthFilter.addEventListener('change', (e) => {
+                state.statsMonthFilter = e.target.value;
+                renderStats();
+            });
+            DOM.statsApp.clearMonthFilterBtn.addEventListener('click', () => {
+                state.statsMonthFilter = '';
+                DOM.statsApp.monthFilter.value = '';
+                renderStats();
             });
 
             document.getElementById('btn-manage-cat-inline').addEventListener('click', () => {
