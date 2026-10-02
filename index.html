@@ -104,6 +104,17 @@
                     <span>Listas</span>
                     <button id="btn-show-new-list" class="hover:text-white transition-colors bg-neutral-800 hover:bg-neutral-700 p-1.5 rounded-md flex items-center justify-center"><i class="ph ph-plus"></i></button>
                 </div>
+                <div class="px-2 flex flex-col gap-2 mb-2">
+                    <div class="relative">
+                        <i class="ph ph-magnifying-glass absolute left-2.5 top-1/2 transform -translate-y-1/2 text-neutral-500"></i>
+                        <input type="text" id="input-search-lists" placeholder="Buscar listas..." class="w-full bg-neutral-900 border border-neutral-800 rounded-md pl-8 pr-2 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600 transition-colors">
+                    </div>
+                    <select id="select-sort-lists" class="w-full bg-neutral-900 border border-neutral-800 rounded-md px-2 py-1.5 text-xs text-neutral-400 focus:outline-none focus:border-neutral-600 transition-colors cursor-pointer">
+                        <option value="desc">Mais Recentes</option>
+                        <option value="asc">Mais Antigas</option>
+                        <option value="az">A-Z</option>
+                    </select>
+                </div>
                 <div id="sidebar-lists" class="flex flex-col gap-1"></div>
             </div>
 
@@ -504,7 +515,9 @@
         let state = { 
             activeView: 'empty-lists',
             statsDateStart: getTodayDateStr().slice(0, 8) + '01', // First day of current month
-            statsDateEnd: getTodayDateStr()
+            statsDateEnd: getTodayDateStr(),
+            listSearchQuery: '',
+            listSortOrder: 'desc'
         };
 
         // --- PWA SETUP VIA BLOB ---
@@ -571,7 +584,9 @@
                 closeBtn: document.getElementById('btn-close-sidebar'),
                 listsContainer: document.getElementById('sidebar-lists'),
                 navBtns: document.querySelectorAll('.nav-btn'),
-                newBtn: document.getElementById('btn-show-new-list')
+                newBtn: document.getElementById('btn-show-new-list'),
+                searchInput: document.getElementById('input-search-lists'),
+                sortSelect: document.getElementById('select-sort-lists')
             },
             views: {
                 list: document.getElementById('view-list'),
@@ -827,12 +842,22 @@
 
         function renderSidebar() {
             DOM.sidebar.listsContainer.innerHTML = '';
-            if (appData.lists.length === 0) {
-                DOM.sidebar.listsContainer.innerHTML = '<div class="px-3 py-4 text-xs text-neutral-600 text-center italic">Nenhuma lista. Crie uma acima.</div>';
+            
+            let filteredLists = appData.lists.filter(l => l.name.toLowerCase().includes(state.listSearchQuery.toLowerCase()));
+            
+            if (filteredLists.length === 0) {
+                DOM.sidebar.listsContainer.innerHTML = '<div class="px-3 py-4 text-xs text-neutral-600 text-center italic">Nenhuma lista encontrada.</div>';
                 return;
             }
-            const sorted = [...appData.lists].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-            sorted.forEach(list => {
+            
+            filteredLists.sort((a, b) => {
+                if (state.listSortOrder === 'desc') return (b.date || '').localeCompare(a.date || '');
+                if (state.listSortOrder === 'asc') return (a.date || '').localeCompare(b.date || '');
+                if (state.listSortOrder === 'az') return a.name.localeCompare(b.name);
+                return 0;
+            });
+
+            filteredLists.forEach(list => {
                 const btn = document.createElement('button');
                 btn.id = `nav-list-${list.id}`;
                 const isActive = appData.activeListId === list.id && state.activeView === 'list';
@@ -961,6 +986,14 @@
 
             DOM.modals.addPrice.classList.remove('hidden'); DOM.modals.addPrice.classList.add('flex');
             setTimeout(() => document.getElementById('input-price-val').focus(), 50);
+        };
+
+        window.goToUnpaidItem = (listId, itemId, itemName) => {
+            selectList(listId);
+            switchView('list');
+            setTimeout(() => {
+                window.openPriceModal(itemId, itemName, true);
+            }, 150);
         };
 
         function renderProducts() {
@@ -1137,21 +1170,25 @@
             } else {
                 unpaidItems.sort((a, b) => b.createdAt - a.createdAt).forEach(ui => {
                     const el = document.createElement('li');
-                    el.className = "flex justify-between items-center p-3 rounded-lg border border-neutral-800 bg-neutral-950 shadow-sm";
+                    el.className = "flex justify-between items-center p-3 rounded-lg border border-neutral-800 bg-neutral-950 shadow-sm cursor-pointer hover:border-blue-500 hover:bg-neutral-900 transition-all group";
+                    el.setAttribute('onclick', `window.goToUnpaidItem('${ui.listId}', '${ui.id}', '${escapeHtml(ui.name).replace(/'/g, "\\'")}')`);
                     
                     const estimatedText = ui.price ? fmtCurrency(ui.price * ui.qtd) : 'Sem valor';
                     const cat = getCategoryDetails(ui.categoryId || ui.category);
 
                     el.innerHTML = `
                         <div class="flex flex-col truncate">
-                            <span class="font-medium text-white truncate text-sm">${escapeHtml(ui.name)}</span>
+                            <span class="font-medium text-white truncate text-sm group-hover:text-blue-400 transition-colors">${escapeHtml(ui.name)}</span>
                             <div class="flex items-center gap-1.5 mt-1 text-[11px] text-neutral-500">
                                 <span class="truncate max-w-[100px] border border-neutral-800 bg-neutral-900 px-1 rounded">${escapeHtml(ui.listName)}</span>
                                 <span>&bull;</span>
                                 <span style="color: ${cat.color}">${escapeHtml(cat.name)}</span>
                             </div>
                         </div>
-                        <span class="text-xs font-semibold text-neutral-400 bg-neutral-900 px-2 py-1 rounded border border-neutral-800">${estimatedText}</span>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-semibold text-neutral-400 bg-neutral-900 px-2 py-1 rounded border border-neutral-800 group-hover:border-blue-500/30 group-hover:text-blue-300 transition-colors">${estimatedText}</span>
+                            <i class="ph ph-arrow-right text-neutral-600 group-hover:text-blue-400 transition-colors"></i>
+                        </div>
                     `;
                     DOM.statsApp.unpaidItemsList.appendChild(el);
                 });
@@ -1433,6 +1470,20 @@
                 state.statsDateEnd = DOM.statsApp.dateEnd.value;
                 renderStats();
             });
+
+            if (DOM.sidebar.searchInput) {
+                DOM.sidebar.searchInput.addEventListener('input', (e) => {
+                    state.listSearchQuery = e.target.value;
+                    renderSidebar();
+                });
+            }
+
+            if (DOM.sidebar.sortSelect) {
+                DOM.sidebar.sortSelect.addEventListener('change', (e) => {
+                    state.listSortOrder = e.target.value;
+                    renderSidebar();
+                });
+            }
         }
 
         function updateCategorySelects() {
