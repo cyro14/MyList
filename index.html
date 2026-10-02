@@ -2,7 +2,7 @@
 <html lang="pt-BR" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AnyList Pro</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -44,19 +44,31 @@
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
 
+        /* Custom Color Input Styling */
+        input[type="color"] {
+            -webkit-appearance: none; border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; padding: 0;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: 2px solid #262626; border-radius: 8px; }
+
         .line-through-custom { text-decoration: line-through; color: #737373; }
         
-        .layout-container { display: flex; height: 100vh; }
+        .layout-container { display: flex; height: 100vh; overflow: hidden; }
         .sidebar { width: 260px; background-color: #171717; border-right: 1px solid #262626; display: flex; flex-direction: column; transition: transform 0.3s ease; z-index: 40; }
         .main-content { flex: 1; overflow-y: auto; background-color: #0a0a0a; display: flex; flex-direction: column; }
         
         @media (max-width: 768px) {
             .sidebar { position: fixed; height: 100vh; transform: translateX(-100%); }
-            .sidebar.open { transform: translateX(0); box-shadow: 4px 0 24px rgba(0,0,0,0.5); }
+            .sidebar.open { transform: translateX(0); box-shadow: 4px 0 24px rgba(0,0,0,0.8); }
         }
 
         .hide-scroll::-webkit-scrollbar { display: none; }
         .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .view-section {
+            animation: fadeIn 0.3s ease forwards;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="antialiased text-sm">
@@ -82,6 +94,9 @@
                 <button class="nav-btn w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors font-medium" data-target="products">
                     <i class="ph ph-package text-lg"></i> Catálogo
                 </button>
+                <button class="nav-btn w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors font-medium" data-target="categories">
+                    <i class="ph ph-tags text-lg"></i> Categorias
+                </button>
                 <button class="nav-btn w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors font-medium" data-target="stats">
                     <i class="ph ph-chart-pie-slice text-lg"></i> Estatísticas
                 </button>
@@ -95,8 +110,13 @@
                 <div id="sidebar-lists" class="flex flex-col gap-1"></div>
             </div>
 
-            <div class="mt-auto px-3 py-3 border-t border-neutral-800/50 text-xs text-neutral-500 flex items-center gap-2 bg-neutral-900/50 rounded-lg">
-                <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></div> Local Storage
+            <div class="mt-auto flex flex-col gap-2">
+                <button id="btn-install-app" class="hidden w-full bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 border border-blue-600/30 text-left px-3 py-2.5 rounded-lg flex items-center gap-3 transition-colors font-medium">
+                    <i class="ph ph-download-simple text-lg"></i> Instalar App
+                </button>
+                <div class="px-3 py-3 border-t border-neutral-800/50 text-xs text-neutral-500 flex items-center gap-2 bg-neutral-900/50 rounded-lg">
+                    <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></div> Local Storage
+                </div>
             </div>
         </aside>
 
@@ -117,8 +137,8 @@
                 <section id="view-list" class="view-section flex flex-col gap-6 hidden">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 hidden md:flex">
                         <div class="flex flex-col gap-1">
-                            <h2 id="current-list-title" class="text-2xl font-bold text-white tracking-tight truncate max-w-md">Lista</h2>
-                            <div class="flex items-center gap-2 text-xs text-neutral-400">
+                            <h2 id="current-list-title" class="text-2xl font-bold text-white tracking-tight truncate max-w-md transition-colors duration-300 border-l-4 pl-3 border-transparent">Lista</h2>
+                            <div class="flex items-center gap-2 text-xs text-neutral-400 ml-4">
                                 <span id="current-list-recurrence-badge" class="hidden bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded font-medium flex items-center gap-1"><i class="ph ph-arrows-clockwise"></i> Recorrente Mensal</span>
                                 <div class="flex items-center gap-1 bg-neutral-900 border border-neutral-800 px-2 py-1 rounded-lg">
                                     <i class="ph ph-calendar text-neutral-400"></i>
@@ -137,17 +157,17 @@
                     </div>
 
                     <!-- Mobile metadata row -->
-                    <div class="md:hidden flex flex-wrap items-center justify-between gap-3 bg-neutral-900 border border-neutral-800 p-3 rounded-xl">
+                    <div class="md:hidden flex flex-wrap items-center justify-between gap-3 bg-neutral-900 border border-neutral-800 p-3 rounded-xl border-l-4" id="mobile-list-header-card">
                         <div class="flex items-center gap-2 text-xs text-neutral-400">
                             <i class="ph ph-calendar text-neutral-400"></i>
                             <input type="date" id="input-list-date-mobile" class="bg-transparent text-white text-xs focus:outline-none cursor-pointer">
                         </div>
                         <div class="flex items-center gap-2">
                             <button id="btn-edit-list-settings-mobile" class="text-neutral-400 hover:text-white text-xs bg-neutral-800 px-2.5 py-1.5 rounded-lg border border-neutral-700 flex items-center gap-1">
-                                <i class="ph ph-gear"></i> Config
+                                <i class="ph ph-gear"></i>
                             </button>
                             <button id="btn-delete-list-mobile" class="text-neutral-500 hover:text-red-400 text-xs bg-neutral-800 px-2.5 py-1.5 rounded-lg border border-neutral-700 flex items-center gap-1">
-                                <i class="ph ph-trash"></i> Apagar
+                                <i class="ph ph-trash"></i>
                             </button>
                         </div>
                     </div>
@@ -160,20 +180,17 @@
                                         <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Item</label>
                                         <button type="button" id="btn-open-catalog-add" class="text-[10px] text-blue-400 hover:text-blue-300 uppercase font-semibold flex items-center gap-1"><i class="ph ph-book-open"></i> Ver Catálogo</button>
                                     </div>
-                                    <input type="text" id="input-item-name" required placeholder="Ex: Maçã Fuji ou Conta de Luz" autocomplete="off"
+                                    <input type="text" id="input-item-name" required placeholder="Ex: Maçã Fuji" autocomplete="off"
                                         class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-neutral-500 transition-all">
                                     <ul id="product-suggestions" class="absolute top-[105%] left-0 right-0 bg-neutral-800 border border-neutral-700 rounded-lg shadow-xl max-h-48 overflow-y-auto hidden z-50 py-1"></ul>
                                 </div>
                                 <div class="md:col-span-3 flex flex-col gap-1.5">
-                                    <div class="flex justify-between items-center">
-                                        <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Categoria</label>
-                                        <button type="button" id="btn-manage-cat-inline" class="text-[10px] text-blue-400 hover:text-blue-300 uppercase font-semibold">Editar</button>
-                                    </div>
+                                    <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Categoria</label>
                                     <select id="input-item-category" required class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-500 transition-all cursor-pointer"></select>
                                 </div>
                                 <div class="grid grid-cols-2 gap-3 md:col-span-4">
                                     <div class="flex flex-col gap-1.5">
-                                        <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Qtd & Unidade</label>
+                                        <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Qtd & Un.</label>
                                         <div class="flex gap-1">
                                             <input type="number" id="input-item-qtd" required min="0.001" step="any" value="1" 
                                                 class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-2 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-500 text-center">
@@ -211,7 +228,7 @@
                             <span id="list-total-text" class="text-white">Total: R$ 0,00</span>
                         </div>
                         <div class="h-2 w-full bg-neutral-900 rounded-full overflow-hidden border border-neutral-800">
-                            <div id="list-progress-bar" class="h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]" style="width: 0%"></div>
+                            <div id="list-progress-bar" class="h-full bg-neutral-500 rounded-full transition-all duration-500" style="width: 0%"></div>
                         </div>
                     </div>
 
@@ -244,13 +261,13 @@
                 <section id="view-products" class="view-section flex flex-col gap-6 hidden">
                     <div>
                         <h2 class="text-2xl font-bold text-white tracking-tight">Catálogo</h2>
-                        <p class="text-sm text-neutral-400 mt-1">Produtos frequentes salvos automaticamente ou manualmente.</p>
+                        <p class="text-sm text-neutral-400 mt-1">Produtos salvos para agilizar suas compras.</p>
                     </div>
 
                     <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-5 shadow-sm">
                         <form id="form-add-product" class="flex flex-col sm:flex-row gap-4 items-end">
                             <div class="flex-1 flex flex-col gap-1.5 w-full">
-                                <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Nome do Produto</label>
+                                <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Nome</label>
                                 <input type="text" id="input-prod-name" required placeholder="Ex: Detergente" 
                                     class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-500">
                             </div>
@@ -271,23 +288,58 @@
                     <ul id="list-products" class="grid grid-cols-1 md:grid-cols-2 gap-3"></ul>
                 </section>
 
+                <!-- VIEW: CATEGORIES -->
+                <section id="view-categories" class="view-section flex flex-col gap-6 hidden">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">Categorias</h2>
+                        <p class="text-sm text-neutral-400 mt-1">Organize seus gastos com cores personalizadas.</p>
+                    </div>
+
+                    <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-5 shadow-sm">
+                        <form id="form-add-category" class="flex flex-col sm:flex-row gap-4 items-end">
+                            <div class="flex-1 flex flex-col gap-1.5 w-full">
+                                <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Nova Categoria</label>
+                                <input type="text" id="input-cat-name" required placeholder="Ex: Farmácia" autocomplete="off"
+                                    class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-500">
+                            </div>
+                            <div class="flex flex-col gap-1.5">
+                                <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Cor</label>
+                                <div class="bg-neutral-950 border border-neutral-800 rounded-lg p-1.5 flex items-center justify-center h-[42px] w-[52px]">
+                                    <input type="color" id="input-cat-color" value="#3b82f6" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full sm:w-auto bg-neutral-200 text-black hover:bg-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors h-[42px]">
+                                Adicionar
+                            </button>
+                        </form>
+                    </div>
+                    <ul id="list-categories" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></ul>
+                </section>
+
                 <!-- VIEW: STATISTICS -->
                 <section id="view-stats" class="view-section flex flex-col gap-6 hidden">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                         <div>
                             <h2 class="text-2xl font-bold text-white tracking-tight">Estatísticas</h2>
                             <p class="text-sm text-neutral-400 mt-1">Gastos baseados nos itens <strong class="text-white">já comprados</strong>.</p>
                         </div>
-                        <div class="flex items-center gap-2 bg-neutral-900 border border-neutral-800 px-3 py-2 rounded-xl">
-                            <i class="ph ph-calendar-blank text-neutral-400"></i>
-                            <input type="month" id="stats-month-filter" class="bg-transparent text-white text-xs focus:outline-none cursor-pointer">
-                            <button id="btn-clear-month-filter" class="text-neutral-500 hover:text-white text-xs ml-1 px-1.5 py-0.5 rounded bg-neutral-800 hidden" title="Limpar Filtro">Todos</button>
+                        <div class="flex flex-col sm:flex-row items-center gap-2 bg-neutral-900 border border-neutral-800 p-2 rounded-xl">
+                            <div class="flex items-center gap-2 px-2">
+                                <span class="text-xs font-semibold text-neutral-500 uppercase">De</span>
+                                <input type="date" id="stats-date-start" class="bg-transparent text-white text-sm focus:outline-none cursor-pointer w-[120px]">
+                            </div>
+                            <div class="hidden sm:block h-5 w-px bg-neutral-700"></div>
+                            <div class="flex items-center gap-2 px-2">
+                                <span class="text-xs font-semibold text-neutral-500 uppercase">Até</span>
+                                <input type="date" id="stats-date-end" class="bg-transparent text-white text-sm focus:outline-none cursor-pointer w-[120px]">
+                            </div>
+                            <button id="btn-apply-stats-filter" class="w-full sm:w-auto bg-neutral-800 hover:bg-neutral-700 text-white text-xs px-3 py-1.5 rounded-lg transition-colors font-medium border border-neutral-700">Aplicar</button>
                         </div>
                     </div>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-sm flex flex-col items-center sm:items-start">
-                            <span class="text-xs font-bold text-neutral-500 uppercase tracking-widest mb-2">Gasto no Período</span>
+                            <span class="text-xs font-bold text-neutral-500 uppercase tracking-widest mb-2">Total Gasto (Período)</span>
                             <span id="stat-total-spent" class="text-4xl font-bold text-white tracking-tight">R$ 0,00</span>
                         </div>
                         <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-sm flex flex-col items-center sm:items-start">
@@ -329,10 +381,18 @@
             </div>
             <form id="form-new-list" class="flex flex-col gap-4">
                 <input type="hidden" id="input-edit-list-id">
-                <div class="flex flex-col gap-1.5">
-                    <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Nome da Lista</label>
-                    <input type="text" id="input-new-list-name" required placeholder="Ex: Contas, Mercado..." autocomplete="off"
-                        class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-neutral-500 transition-all">
+                <div class="flex gap-3">
+                    <div class="flex flex-col gap-1.5 flex-1">
+                        <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Nome da Lista</label>
+                        <input type="text" id="input-new-list-name" required placeholder="Ex: Mercado..." autocomplete="off"
+                            class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-neutral-500 transition-all">
+                    </div>
+                    <div class="flex flex-col gap-1.5">
+                        <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Cor</label>
+                        <div class="bg-neutral-950 border border-neutral-800 rounded-lg p-1.5 flex items-center justify-center h-[46px] w-[52px]">
+                            <input type="color" id="input-new-list-color" value="#3b82f6" required>
+                        </div>
+                    </div>
                 </div>
                 <div class="flex flex-col gap-1.5">
                     <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Data da Lista</label>
@@ -378,28 +438,6 @@
         </div>
     </div>
 
-    <!-- MODAL: CATEGORIES -->
-    <div id="modal-categories" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex-col items-center justify-center z-50 p-4">
-        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col">
-            <div class="px-6 py-5 border-b border-neutral-800 flex justify-between items-center bg-neutral-900/50">
-                <h3 class="font-semibold text-white tracking-tight">Gerenciar Categorias</h3>
-                <button class="btn-close-modal text-neutral-500 hover:text-white p-1 rounded-md hover:bg-neutral-800 transition-colors"><i class="ph ph-x"></i></button>
-            </div>
-            <div class="p-6 flex flex-col gap-5 bg-neutral-900">
-                <form id="form-add-category" class="flex gap-2">
-                    <input type="text" id="input-new-category" placeholder="Nova categoria..." required autocomplete="off"
-                        class="flex-1 bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-500">
-                    <button type="submit" class="bg-neutral-800 text-white hover:bg-neutral-700 border border-neutral-700 px-5 py-2.5 rounded-lg text-sm font-medium transition-colors">
-                        Adicionar
-                    </button>
-                </form>
-                <div class="max-h-64 overflow-y-auto pr-1 hide-scroll">
-                    <ul id="list-categories-manage" class="flex flex-col gap-2"></ul>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- MODAL: CATALOG SELECT -->
     <div id="modal-select-catalog" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex-col items-center justify-center z-50 p-4 transition-opacity">
         <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
@@ -420,8 +458,15 @@
     </div>
 
     <script>
-        const DEFAULT_CATEGORIES = ['Mercado', 'Mercado Livre', 'Contas', 'Assinaturas'];
-        const STORAGE_KEY = 'anylist_local_data_v3';
+        const STORAGE_KEY = 'anylist_local_data_v4';
+
+        // Base defaults
+        const DEFAULT_CATEGORIES = [
+            { id: 'cat_1', name: 'Mercado', color: '#10b981' },       // Emerald
+            { id: 'cat_2', name: 'Mercado Livre', color: '#eab308' }, // Yellow
+            { id: 'cat_3', name: 'Contas', color: '#ef4444' },        // Red
+            { id: 'cat_4', name: 'Assinaturas', color: '#8b5cf6' }    // Violet
+        ];
 
         let appData = {
             categories: [...DEFAULT_CATEGORIES],
@@ -431,12 +476,72 @@
             activeListId: null
         };
 
+        const getTodayDateStr = () => new Date().toISOString().slice(0, 10);
+        
         let state = { 
             activeView: 'empty-lists',
-            statsMonthFilter: '' // format YYYY-MM
+            statsDateStart: getTodayDateStr().slice(0, 8) + '01', // First day of current month
+            statsDateEnd: getTodayDateStr()
         };
 
-        const getTodayDateStr = () => new Date().toISOString().slice(0, 10);
+        // --- PWA SETUP VIA BLOB ---
+        (function setupPWA() {
+            // 1. Inject Manifest
+            const manifest = {
+                "name": "AnyList Pro",
+                "short_name": "AnyList",
+                "start_url": ".",
+                "display": "standalone",
+                "background_color": "#0a0a0a",
+                "theme_color": "#0a0a0a",
+                "icons": [{
+                    "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2Ij48cmVjdCB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgZmlsbD0ibm9uZSIvPjxwb2x5bGluZSBwb2ludHM9IjQwIDE0NCA5NiAyMDAgMjI0IDcyIiBmaWxsPSJub25lIiBzdHJva2U9IiMzYjgyZjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLXdpZHRoPSIyNCIvPjwvc3ZnPg==",
+                    "sizes": "192x192",
+                    "type": "image/svg+xml"
+                }]
+            };
+            const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+            const manifestUrl = URL.createObjectURL(manifestBlob);
+            const link = document.createElement('link');
+            link.rel = 'manifest';
+            link.href = manifestUrl;
+            document.head.appendChild(link);
+
+            // 2. Register Service Worker (Required for install prompt in some browsers)
+            const swCode = `
+                self.addEventListener('install', e => self.skipWaiting());
+                self.addEventListener('activate', e => self.clients.claim());
+                self.addEventListener('fetch', e => {
+                    if (e.request.url.startsWith(self.location.origin)) {
+                        e.respondWith(fetch(e.request).catch(() => new Response('Offline AnyList App', {headers: {'Content-Type': 'text/html'}})));
+                    }
+                });
+            `;
+            const swBlob = new Blob([swCode], {type: 'application/javascript'});
+            const swUrl = URL.createObjectURL(swBlob);
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register(swUrl).catch(err => console.log('SW registration failed:', err));
+            }
+
+            // 3. Handle Install Prompt
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                const btn = document.getElementById('btn-install-app');
+                if(btn) {
+                    btn.classList.remove('hidden');
+                    btn.addEventListener('click', async () => {
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        if (outcome === 'accepted') {
+                            btn.classList.add('hidden');
+                        }
+                        deferredPrompt = null;
+                    });
+                }
+            });
+        })();
 
         const DOM = {
             sidebar: {
@@ -451,12 +556,12 @@
             views: {
                 list: document.getElementById('view-list'),
                 products: document.getElementById('view-products'),
+                categories: document.getElementById('view-categories'),
                 stats: document.getElementById('view-stats'),
                 empty: document.getElementById('view-empty-lists')
             },
             modals: {
                 newList: document.getElementById('modal-new-list'),
-                categories: document.getElementById('modal-categories'),
                 addPrice: document.getElementById('modal-add-price'),
                 selectCatalog: document.getElementById('modal-select-catalog')
             },
@@ -470,6 +575,7 @@
             listApp: {
                 title: document.getElementById('current-list-title'),
                 mobileTitle: document.getElementById('mobile-header-title'),
+                mobileCard: document.getElementById('mobile-list-header-card'),
                 recurrenceBadge: document.getElementById('current-list-recurrence-badge'),
                 inputDate: document.getElementById('input-list-date'),
                 inputDateMobile: document.getElementById('input-list-date-mobile'),
@@ -502,12 +608,18 @@
                 inputCat: document.getElementById('input-prod-category'),
                 inputPrice: document.getElementById('input-prod-price')
             },
+            categoriesApp: {
+                list: document.getElementById('list-categories'),
+                inputName: document.getElementById('input-cat-name'),
+                inputColor: document.getElementById('input-cat-color')
+            },
             statsApp: {
                 totalSpent: document.getElementById('stat-total-spent'),
                 totalItems: document.getElementById('stat-total-items'),
                 categoriesList: document.getElementById('stats-categories'),
-                monthFilter: document.getElementById('stats-month-filter'),
-                clearMonthFilterBtn: document.getElementById('btn-clear-month-filter')
+                dateStart: document.getElementById('stats-date-start'),
+                dateEnd: document.getElementById('stats-date-end'),
+                btnApply: document.getElementById('btn-apply-stats-filter')
             }
         };
 
@@ -516,17 +628,34 @@
             if (stored) {
                 try {
                     const parsed = JSON.parse(stored);
-                    appData = { ...appData, ...parsed };
-                    if(!appData.categories || appData.categories.length === 0) {
-                        appData.categories = [...DEFAULT_CATEGORIES];
+                    
+                    // Basic Migration: Convert old string categories to object format if necessary
+                    if (parsed.categories && parsed.categories.length > 0 && typeof parsed.categories[0] === 'string') {
+                        parsed.categories = parsed.categories.map((c, i) => {
+                            const defaults = DEFAULT_CATEGORIES.find(d => d.name.toLowerCase() === c.toLowerCase());
+                            return { 
+                                id: 'cat_' + Date.now() + i, 
+                                name: c, 
+                                color: defaults ? defaults.color : '#525252' 
+                            };
+                        });
+                        // Filter out 'Benfica' if migrating from old data
+                        parsed.categories = parsed.categories.filter(c => c.name.toLowerCase() !== 'benfica');
                     }
+
+                    appData = { ...appData, ...parsed };
+                    
                 } catch (e) {
                     console.error("Error parsing local storage", e);
                 }
             }
             
-            // Check recurring monthly lists
             checkRecurringLists();
+            
+            // Set stats default dates
+            DOM.statsApp.dateStart.value = state.statsDateStart;
+            DOM.statsApp.dateEnd.value = state.statsDateEnd;
+
             syncUI();
         }
 
@@ -537,7 +666,6 @@
             appData.lists.forEach(list => {
                 if (list.isRecurring) {
                     if (!list.lastResetMonth || list.lastResetMonth < currentMonthStr) {
-                        // Reset all items in this list to unbought
                         appData.items.forEach(item => {
                             if (item.listId === list.id) {
                                 item.isBought = false;
@@ -549,10 +677,7 @@
                     }
                 }
             });
-
-            if (updated) {
-                saveDataToStorage();
-            }
+            if (updated) saveDataToStorage();
         }
 
         function saveDataToStorage() {
@@ -568,9 +693,26 @@
             return Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
         }
 
+        function getCategoryDetails(catIdOrName) {
+            let cat = appData.categories.find(c => c.id === catIdOrName || c.name === catIdOrName);
+            return cat || { name: catIdOrName || 'Desconhecida', color: '#525252' };
+        }
+
+        function hexToRgba(hex, alpha = 1) {
+            let r=0, g=0, b=0;
+            if(hex.length == 4) { r=parseInt(hex[1]+hex[1],16); g=parseInt(hex[2]+hex[2],16); b=parseInt(hex[3]+hex[3],16); }
+            else if(hex.length == 7) { r=parseInt(hex.slice(1,3),16); g=parseInt(hex.slice(3,5),16); b=parseInt(hex.slice(5,7),16); }
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+
+        function createCatBadgeHTML(cat) {
+            const bg = hexToRgba(cat.color, 0.15);
+            const border = hexToRgba(cat.color, 0.3);
+            return `<span class="uppercase tracking-wider font-bold text-[10px] px-1.5 py-0.5 rounded border" style="background-color: ${bg}; border-color: ${border}; color: ${cat.color}">${escapeHtml(cat.name)}</span>`;
+        }
+
         function syncUI() {
             updateCategorySelects();
-            renderManageCategories();
             renderSidebar();
             
             if (appData.activeListId && !appData.lists.find(l => l.id === appData.activeListId)) {
@@ -590,6 +732,7 @@
 
             if (state.activeView === 'list') renderActiveList();
             if (state.activeView === 'products') renderProducts();
+            if (state.activeView === 'categories') renderCategories();
             if (state.activeView === 'stats') renderStats();
         }
 
@@ -610,6 +753,12 @@
                     DOM.listApp.inputDate.value = activeList.date || getTodayDateStr();
                     DOM.listApp.inputDateMobile.value = activeList.date || getTodayDateStr();
                     DOM.listApp.recurrenceBadge.classList.toggle('hidden', !activeList.isRecurring);
+                    
+                    const listColor = activeList.color || '#3b82f6';
+                    DOM.listApp.title.style.borderColor = listColor;
+                    DOM.listApp.mobileCard.style.borderColor = listColor;
+                    DOM.listApp.progressBar.style.backgroundColor = listColor;
+                    DOM.listApp.progressBar.style.boxShadow = `0 0 10px ${hexToRgba(listColor, 0.5)}`;
                 }
                 renderActiveList();
             } else if (viewName === 'products') {
@@ -617,6 +766,11 @@
                 document.querySelector('[data-target="products"]').classList.add('bg-neutral-800', 'text-white');
                 DOM.listApp.mobileTitle.textContent = "Catálogo";
                 renderProducts();
+            } else if (viewName === 'categories') {
+                DOM.views.categories.classList.remove('hidden'); DOM.views.categories.classList.add('flex');
+                document.querySelector('[data-target="categories"]').classList.add('bg-neutral-800', 'text-white');
+                DOM.listApp.mobileTitle.textContent = "Categorias";
+                renderCategories();
             } else if (viewName === 'stats') {
                 DOM.views.stats.classList.remove('hidden'); DOM.views.stats.classList.add('flex');
                 document.querySelector('[data-target="stats"]').classList.add('bg-neutral-800', 'text-white');
@@ -644,14 +798,21 @@
             sorted.forEach(list => {
                 const btn = document.createElement('button');
                 btn.id = `nav-list-${list.id}`;
-                btn.className = `sidebar-list-item w-full text-left px-3 py-2.5 rounded-lg flex items-center justify-between text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors truncate font-medium ${appData.activeListId === list.id && state.activeView === 'list' ? 'bg-neutral-800 text-white' : ''}`;
+                const isActive = appData.activeListId === list.id && state.activeView === 'list';
+                btn.className = `sidebar-list-item w-full text-left px-3 py-2.5 rounded-lg flex items-center justify-between text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors truncate font-medium border-l-[3px] ${isActive ? 'bg-neutral-800 text-white' : 'border-transparent'}`;
+                
+                const listColor = list.color || '#3b82f6';
+                if(isActive) btn.style.borderColor = listColor;
+                
                 btn.innerHTML = `
                     <div class="flex items-center gap-3 truncate">
-                        <i class="ph ph-list-bullets text-lg flex-shrink-0"></i> 
+                        <div class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-sm" style="background-color: ${listColor}"></div>
                         <span class="truncate">${escapeHtml(list.name)}</span>
                     </div>
                     ${list.isRecurring ? '<i class="ph ph-arrows-clockwise text-xs text-blue-400 flex-shrink-0" title="Recorrente Mensal"></i>' : ''}
                 `;
+                btn.onmouseenter = () => { if(!isActive) btn.style.borderColor = listColor; };
+                btn.onmouseleave = () => { if(!isActive) btn.style.borderColor = 'transparent'; };
                 btn.onclick = () => { selectList(list.id); switchView('list'); };
                 DOM.sidebar.listsContainer.appendChild(btn);
             });
@@ -677,7 +838,7 @@
             });
 
             DOM.listApp.progressText.textContent = `${bought.length} de ${listItems.length} itens`;
-            DOM.listApp.progressTotal.innerHTML = `Total: <span class="font-bold text-blue-400">${fmtCurrency(totalBought)}</span> / <span class="text-neutral-500">${fmtCurrency(totalExpected)}</span>`;
+            DOM.listApp.progressTotal.innerHTML = `Total: <span class="font-bold text-white">${fmtCurrency(totalBought)}</span> <span class="text-neutral-500 font-normal">/ ${fmtCurrency(totalExpected)}</span>`;
             const pct = listItems.length > 0 ? (bought.length / listItems.length) * 100 : 0;
             DOM.listApp.progressBar.style.width = `${pct}%`;
 
@@ -698,11 +859,12 @@
             
             const itemTotal = item.price ? (item.qtd * item.price) : 0;
             let priceHtml = '';
+            const cat = getCategoryDetails(item.categoryId || item.category); // Fallback for old data
 
             if (item.price) {
                 priceHtml = `<span class="text-sm font-semibold text-white ${item.isBought ? 'line-through-custom' : ''}">${fmtCurrency(itemTotal)}</span>`;
             } else {
-                priceHtml = `<button onclick="window.openPriceModal('${item.id}', '${escapeHtml(item.name).replace(/'/g, "\\'")}', false)" class="text-xs font-semibold tracking-wide text-blue-400 bg-blue-500/10 hover:bg-blue-500/20 px-3 py-1.5 rounded-lg transition-colors border border-blue-500/20 whitespace-nowrap">+ Preço</button>`;
+                priceHtml = `<button onclick="window.openPriceModal('${item.id}', '${escapeHtml(item.name).replace(/'/g, "\\'")}', false)" class="text-xs font-semibold tracking-wide text-neutral-400 bg-neutral-800 hover:text-white px-3 py-1.5 rounded-lg transition-colors border border-neutral-700 whitespace-nowrap">+ Preço</button>`;
             }
 
             const unitLabel = item.unit || 'un';
@@ -715,7 +877,7 @@
                     <div class="flex flex-col truncate">
                         <span class="font-medium text-white truncate text-[15px] ${item.isBought ? 'line-through-custom' : ''}">${escapeHtml(item.name)}</span>
                         <div class="flex items-center gap-2 mt-1 text-xs text-neutral-500">
-                            <span class="uppercase tracking-wider font-bold text-[10px] bg-neutral-800 px-1.5 py-0.5 rounded text-neutral-400 border border-neutral-700/50">${escapeHtml(item.category)}</span>
+                            ${createCatBadgeHTML(cat)}
                             <span>&bull;</span>
                             <span>${item.qtd} ${unitLabel} ${item.price ? `(${fmtCurrency(item.price)}/${unitLabel})` : ''}</span>
                         </div>
@@ -767,19 +929,20 @@
         function renderProducts() {
             DOM.productsApp.list.innerHTML = '';
             if(appData.products.length === 0) {
-                DOM.productsApp.list.innerHTML = '<div class="col-span-full text-neutral-500 text-sm text-center py-12 bg-neutral-900 rounded-xl border border-neutral-800 border-dashed">Nenhum produto cadastrado no catálogo.</div>';
+                DOM.productsApp.list.innerHTML = '<div class="col-span-full text-neutral-500 text-sm text-center py-12 bg-neutral-900 rounded-xl border border-neutral-800 border-dashed">Nenhum produto salvo no catálogo.</div>';
                 return;
             }
             const sorted = [...appData.products].sort((a,b) => a.name.localeCompare(b.name));
 
             sorted.forEach(p => {
+                const cat = getCategoryDetails(p.defaultCategoryId || p.defaultCategory);
                 const li = document.createElement('li');
                 li.className = "flex justify-between items-center p-4 rounded-xl border border-neutral-800 bg-neutral-900 shadow-sm";
                 li.innerHTML = `
                     <div class="flex flex-col truncate pr-2">
                         <span class="font-medium text-white truncate text-[15px]">${escapeHtml(p.name)}</span>
-                        <div class="flex items-center gap-2 mt-1 text-xs text-neutral-500">
-                            <span class="uppercase tracking-wider font-bold text-[10px] bg-neutral-800 px-1.5 py-0.5 rounded border border-neutral-700/50">${escapeHtml(p.defaultCategory)}</span>
+                        <div class="flex items-center gap-2 mt-1.5 text-xs text-neutral-500">
+                            ${createCatBadgeHTML(cat)}
                             ${p.defaultPrice ? `<span>&bull;</span><span>${fmtCurrency(p.defaultPrice)} un.</span>` : ''}
                         </div>
                     </div>
@@ -792,64 +955,94 @@
         window.deleteProduct = (id) => {
             appData.products = appData.products.filter(p => p.id !== id);
             saveData();
-            showToast("Produto removido");
+            showToast("Produto removido do catálogo");
         }
+
+        function renderCategories() {
+            DOM.categoriesApp.list.innerHTML = '';
+            if(appData.categories.length === 0) return;
+            
+            appData.categories.forEach((cat) => {
+                const li = document.createElement('li');
+                li.className = "flex justify-between items-center px-4 py-3 bg-neutral-900 rounded-xl border border-neutral-800 shadow-sm group";
+                li.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-4 h-4 rounded-full border border-white/10" style="background-color: ${cat.color}"></div>
+                        <span class="font-medium text-white text-sm">${escapeHtml(cat.name)}</span>
+                    </div>
+                    <button onclick="window.deleteCategory('${cat.id}')" class="text-neutral-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-neutral-800 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"><i class="ph ph-trash text-lg"></i></button>
+                `;
+                DOM.categoriesApp.list.appendChild(li);
+            });
+        }
+
+        window.deleteCategory = (id) => {
+            if(appData.items.some(i => i.categoryId === id || i.category === id) || appData.products.some(p => p.defaultCategoryId === id || p.defaultCategory === id)) {
+                showToast("Esta categoria está em uso em itens ou produtos!", true); return;
+            }
+            appData.categories = appData.categories.filter(c => c.id !== id);
+            saveData();
+            showToast("Categoria removida");
+        };
 
         function renderStats() {
             let totalSpent = 0;
             const byCategory = {};
             let countBought = 0;
 
-            const monthFilter = state.statsMonthFilter; // 'YYYY-MM' or ''
+            const dStart = state.statsDateStart;
+            const dEnd = state.statsDateEnd;
 
             appData.items.forEach(i => {
                 if(i.isBought && i.price) {
-                    // Determine date to check against month filter
                     let dateToCheck = null;
                     if(i.boughtAt) {
-                        dateToCheck = new Date(i.boughtAt).toISOString().slice(0, 7);
+                        dateToCheck = new Date(i.boughtAt).toISOString().slice(0, 10);
                     } else {
                         const list = appData.lists.find(l => l.id === i.listId);
                         if(list && list.date) {
-                            dateToCheck = list.date.slice(0, 7);
+                            dateToCheck = list.date.slice(0, 10);
                         }
                     }
 
-                    if(monthFilter && dateToCheck !== monthFilter) {
-                        return; // skip if doesn't match month filter
+                    if(dateToCheck) {
+                        if (dStart && dateToCheck < dStart) return;
+                        if (dEnd && dateToCheck > dEnd) return;
                     }
 
                     const itemTot = i.qtd * i.price;
                     totalSpent += itemTot;
                     countBought++;
-                    byCategory[i.category] = (byCategory[i.category] || 0) + itemTot;
+                    
+                    const catId = i.categoryId || i.category;
+                    byCategory[catId] = (byCategory[catId] || 0) + itemTot;
                 }
             });
 
             DOM.statsApp.totalSpent.textContent = fmtCurrency(totalSpent);
             DOM.statsApp.totalItems.textContent = countBought;
-            DOM.statsApp.clearMonthFilterBtn.classList.toggle('hidden', !monthFilter);
 
             DOM.statsApp.categoriesList.innerHTML = '';
             if(Object.keys(byCategory).length === 0) {
-                DOM.statsApp.categoriesList.innerHTML = '<div class="text-sm text-neutral-500 py-8 text-center bg-neutral-950 rounded-xl border border-neutral-800 border-dashed">Nenhuma compra concluída encontrada para este período.</div>';
+                DOM.statsApp.categoriesList.innerHTML = '<div class="text-sm text-neutral-500 py-8 text-center bg-neutral-950 rounded-xl border border-neutral-800 border-dashed">Nenhuma compra encontrada neste período.</div>';
                 return;
             }
 
             const max = Math.max(...Object.values(byCategory));
             Object.entries(byCategory)
                 .sort((a,b) => b[1] - a[1])
-                .forEach(([cat, val]) => {
+                .forEach(([catId, val]) => {
+                    const cat = getCategoryDetails(catId);
                     const w = max > 0 ? (val / max) * 100 : 0;
                     const el = document.createElement('div');
                     el.className = "flex flex-col gap-1.5";
                     el.innerHTML = `
                         <div class="flex justify-between text-sm items-end">
-                            <span class="font-semibold text-neutral-300 uppercase tracking-wider text-[10px]">${escapeHtml(cat)}</span>
+                            ${createCatBadgeHTML(cat)}
                             <span class="font-bold text-white text-sm">${fmtCurrency(val)}</span>
                         </div>
                         <div class="h-2.5 w-full bg-neutral-950 border border-neutral-800 rounded-full overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full" style="width: ${w}%"></div>
+                            <div class="h-full rounded-full transition-all duration-700" style="width: ${w}%; background-color: ${cat.color}; box-shadow: 0 0 10px ${hexToRgba(cat.color, 0.4)}"></div>
                         </div>
                     `;
                     DOM.statsApp.categoriesList.appendChild(el);
@@ -864,6 +1057,7 @@
                 const titleHeader = document.getElementById('modal-list-title-header');
                 const submitBtn = document.getElementById('btn-submit-list-modal');
                 const nameInput = document.getElementById('input-new-list-name');
+                const colorInput = document.getElementById('input-new-list-color');
                 const dateInput = document.getElementById('input-new-list-date');
                 const recurringInput = document.getElementById('input-new-list-recurring');
                 const editIdInput = document.getElementById('input-edit-list-id');
@@ -872,6 +1066,7 @@
                     titleHeader.textContent = "Editar Lista";
                     submitBtn.textContent = "Salvar Alterações";
                     nameInput.value = listToEdit.name;
+                    colorInput.value = listToEdit.color || '#3b82f6';
                     dateInput.value = listToEdit.date || getTodayDateStr();
                     recurringInput.checked = !!listToEdit.isRecurring;
                     editIdInput.value = listToEdit.id;
@@ -879,6 +1074,7 @@
                     titleHeader.textContent = "Criar Nova Lista";
                     submitBtn.textContent = "Criar Lista";
                     nameInput.value = "";
+                    colorInput.value = '#3b82f6';
                     dateInput.value = getTodayDateStr();
                     recurringInput.checked = false;
                     editIdInput.value = "";
@@ -906,7 +1102,6 @@
                 });
             }
 
-            // Date inputs change handlers for active list
             const handleDateChange = (e) => {
                 if(!appData.activeListId) return;
                 const list = appData.lists.find(l => l.id === appData.activeListId);
@@ -945,6 +1140,7 @@
             DOM.forms.newList.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const name = document.getElementById('input-new-list-name').value.trim();
+                const color = document.getElementById('input-new-list-color').value;
                 const date = document.getElementById('input-new-list-date').value || getTodayDateStr();
                 const isRecurring = document.getElementById('input-new-list-recurring').checked;
                 const editId = document.getElementById('input-edit-list-id').value;
@@ -955,6 +1151,7 @@
                     const list = appData.lists.find(l => l.id === editId);
                     if(list) {
                         list.name = name;
+                        list.color = color;
                         list.date = date;
                         list.isRecurring = isRecurring;
                     }
@@ -964,9 +1161,7 @@
                 } else {
                     const newList = { 
                         id: generateId(), 
-                        name, 
-                        date, 
-                        isRecurring, 
+                        name, color, date, isRecurring, 
                         createdAt: Date.now(),
                         lastResetMonth: isRecurring ? date.slice(0, 7) : null 
                     };
@@ -997,45 +1192,40 @@
                 if(!appData.activeListId) return;
                 
                 const name = DOM.listApp.inputName.value.trim();
-                const category = DOM.listApp.inputCat.value;
+                const categoryId = DOM.listApp.inputCat.value;
                 const qtd = parseFloat(DOM.listApp.inputQtd.value) || 1;
                 const unit = DOM.listApp.inputUnit.value;
                 const priceVal = DOM.listApp.inputPrice.value;
                 const price = priceVal !== "" ? parseFloat(priceVal) : null;
 
-                if(!name || !category) return;
+                if(!name || !categoryId) return;
 
-                // 1. Check if product already exists in catalog (case insensitive), if not, add it automatically!
+                // Auto-save to catalog
                 const existingProd = appData.products.find(p => p.name.toLowerCase() === name.toLowerCase());
                 if (!existingProd) {
                     appData.products.push({
                         id: generateId(),
                         name: name,
-                        defaultCategory: category,
+                        defaultCategoryId: categoryId,
                         defaultPrice: price,
                         createdAt: Date.now()
                     });
                 }
 
-                // 2. Add item to current list
-                const newItem = {
+                appData.items.push({
                     id: generateId(),
                     listId: appData.activeListId,
-                    name, category, qtd, unit, price,
-                    isBought: false,
-                    boughtAt: null,
-                    createdAt: Date.now()
-                };
+                    name, categoryId, qtd, unit, price,
+                    isBought: false, boughtAt: null, createdAt: Date.now()
+                });
 
-                appData.items.push(newItem);
                 saveData();
-
                 DOM.listApp.inputName.value = ''; 
                 DOM.listApp.inputQtd.value = '1'; 
                 DOM.listApp.inputPrice.value = '';
                 DOM.listApp.inputName.focus(); 
                 DOM.listApp.suggestions.classList.add('hidden');
-                showToast("Item adicionado e salvo no Catálogo!");
+                showToast("Item adicionado!");
             });
 
             DOM.forms.addPrice.addEventListener('submit', (e) => {
@@ -1056,7 +1246,6 @@
                     saveData();
                     showToast(actionType === 'check' ? "Compra confirmada!" : "Preço atualizado!");
                 }
-
                 DOM.modals.addPrice.classList.add('hidden'); DOM.modals.addPrice.classList.remove('flex');
             });
 
@@ -1068,12 +1257,13 @@
 
                 DOM.listApp.suggestions.innerHTML = '';
                 matches.forEach(m => {
+                    const cat = getCategoryDetails(m.defaultCategoryId || m.defaultCategory);
                     const li = document.createElement('li');
-                    li.className = "px-4 py-2.5 hover:bg-neutral-700 cursor-pointer text-sm text-white border-b border-neutral-700/50 last:border-0 font-medium transition-colors flex justify-between";
-                    li.innerHTML = `<span>${escapeHtml(m.name)}</span> <span class="text-xs text-neutral-400">${escapeHtml(m.defaultCategory)}</span>`;
+                    li.className = "px-4 py-2.5 hover:bg-neutral-700 cursor-pointer text-sm text-white border-b border-neutral-700/50 last:border-0 font-medium transition-colors flex justify-between items-center";
+                    li.innerHTML = `<span>${escapeHtml(m.name)}</span> ${createCatBadgeHTML(cat)}`;
                     li.onclick = () => {
                         DOM.listApp.inputName.value = m.name; 
-                        DOM.listApp.inputCat.value = m.defaultCategory;
+                        DOM.listApp.inputCat.value = m.defaultCategoryId || m.defaultCategory || appData.categories[0]?.id;
                         if(m.defaultPrice) DOM.listApp.inputPrice.value = m.defaultPrice;
                         DOM.listApp.suggestions.classList.add('hidden'); DOM.listApp.inputQtd.focus();
                     };
@@ -1099,52 +1289,37 @@
             DOM.forms.addProduct.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const name = DOM.productsApp.inputName.value.trim();
-                const defaultCategory = DOM.productsApp.inputCat.value;
+                const defaultCategoryId = DOM.productsApp.inputCat.value;
                 const pVal = DOM.productsApp.inputPrice.value;
                 const defaultPrice = pVal ? parseFloat(pVal) : null;
                 
-                appData.products.push({ id: generateId(), name, defaultCategory, defaultPrice, createdAt: Date.now() });
+                appData.products.push({ id: generateId(), name, defaultCategoryId, defaultPrice, createdAt: Date.now() });
                 saveData();
                 DOM.forms.addProduct.reset(); 
                 showToast("Produto salvo no catálogo!");
             });
 
-            // Statistics month filter listeners
-            DOM.statsApp.monthFilter.addEventListener('change', (e) => {
-                state.statsMonthFilter = e.target.value;
-                renderStats();
-            });
-            DOM.statsApp.clearMonthFilterBtn.addEventListener('click', () => {
-                state.statsMonthFilter = '';
-                DOM.statsApp.monthFilter.value = '';
-                renderStats();
-            });
-
-            document.getElementById('btn-manage-cat-inline').addEventListener('click', () => {
-                DOM.modals.categories.classList.remove('hidden'); DOM.modals.categories.classList.add('flex');
-                setTimeout(() => document.getElementById('input-new-category').focus(), 50);
-            });
-            
             DOM.forms.addCategory.addEventListener('submit', (e) => {
                 e.preventDefault();
-                const newCat = document.getElementById('input-new-category').value.trim();
-                if(!newCat || appData.categories.map(c=>c.toLowerCase()).includes(newCat.toLowerCase())) {
-                    showToast("Categoria inválida ou existente");
-                    return;
+                const name = DOM.categoriesApp.inputName.value.trim();
+                const color = DOM.categoriesApp.inputColor.value;
+                
+                if(appData.categories.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+                    showToast("Já existe uma categoria com este nome", true); return;
                 }
-                appData.categories.push(newCat);
+                
+                appData.categories.push({ id: generateId(), name, color });
                 saveData();
-                document.getElementById('input-new-category').value = '';
+                DOM.forms.addCategory.reset();
+                DOM.categoriesApp.inputColor.value = '#3b82f6'; // reset to default blue
+                showToast("Categoria adicionada!");
             });
 
-            window.deleteCategory = (idx) => {
-                const cat = appData.categories[idx];
-                if(appData.items.some(i => i.category === cat) || appData.products.some(p => p.defaultCategory === cat)) {
-                    showToast("Esta categoria está em uso!"); return;
-                }
-                appData.categories.splice(idx, 1);
-                saveData();
-            };
+            DOM.statsApp.btnApply.addEventListener('click', () => {
+                state.statsDateStart = DOM.statsApp.dateStart.value;
+                state.statsDateEnd = DOM.statsApp.dateEnd.value;
+                renderStats();
+            });
         }
 
         function updateCategorySelects() {
@@ -1155,22 +1330,14 @@
                 select.innerHTML = '';
                 appData.categories.forEach(cat => {
                     const opt = document.createElement('option');
-                    opt.value = cat; opt.textContent = cat;
+                    opt.value = cat.id; opt.textContent = cat.name;
                     select.appendChild(opt);
                 });
-                if(appData.categories.includes(currentVal)) select.value = currentVal;
-            });
-        }
-
-        function renderManageCategories() {
-            const list = document.getElementById('list-categories-manage');
-            if(!list) return;
-            list.innerHTML = '';
-            appData.categories.forEach((cat, idx) => {
-                const li = document.createElement('li');
-                li.className = "flex justify-between items-center px-4 py-3 bg-neutral-950 rounded-xl border border-neutral-800 text-sm text-white font-medium";
-                li.innerHTML = `<span>${escapeHtml(cat)}</span> <button onclick="window.deleteCategory(${idx})" class="text-neutral-500 hover:text-red-400 bg-neutral-900 p-1.5 rounded-lg transition-colors"><i class="ph ph-trash text-lg"></i></button>`;
-                list.appendChild(li);
+                if(appData.categories.some(c => c.id === currentVal)) {
+                    select.value = currentVal;
+                } else if(appData.categories.length > 0) {
+                    select.value = appData.categories[0].id;
+                }
             });
         }
 
@@ -1180,20 +1347,21 @@
             list.innerHTML = '';
             
             if(appData.products.length === 0) {
-                list.innerHTML = '<div class="text-neutral-500 text-sm text-center py-8 bg-neutral-950 rounded-xl border border-neutral-800 border-dashed">Catálogo vazio. Cadastre novos produtos na aba Catálogo.</div>';
+                list.innerHTML = '<div class="text-neutral-500 text-sm text-center py-8 bg-neutral-950 rounded-xl border border-neutral-800 border-dashed">Catálogo vazio.</div>';
                 return;
             }
 
             const sorted = [...appData.products].sort((a,b) => a.name.localeCompare(b.name));
             
             sorted.forEach(p => {
+                const cat = getCategoryDetails(p.defaultCategoryId || p.defaultCategory);
                 const li = document.createElement('li');
                 li.className = "flex justify-between items-center px-4 py-3 bg-neutral-950 hover:bg-neutral-800 rounded-xl border border-neutral-800 cursor-pointer transition-colors shadow-sm group";
                 li.innerHTML = `
                     <div class="flex flex-col truncate pr-2">
                         <span class="font-medium text-white truncate text-[15px] group-hover:text-blue-400 transition-colors">${escapeHtml(p.name)}</span>
-                        <div class="flex items-center gap-2 mt-1 text-xs text-neutral-500">
-                            <span class="uppercase tracking-wider font-bold text-[10px] bg-neutral-900 px-1.5 py-0.5 rounded border border-neutral-700/50">${escapeHtml(p.defaultCategory)}</span>
+                        <div class="flex items-center gap-2 mt-1.5 text-xs text-neutral-500">
+                            ${createCatBadgeHTML(cat)}
                             ${p.defaultPrice ? `<span>&bull;</span><span>${fmtCurrency(p.defaultPrice)} un.</span>` : ''}
                         </div>
                     </div>
@@ -1201,7 +1369,7 @@
                 `;
                 li.onclick = () => {
                     DOM.listApp.inputName.value = p.name;
-                    DOM.listApp.inputCat.value = p.defaultCategory;
+                    DOM.listApp.inputCat.value = p.defaultCategoryId || p.defaultCategory || appData.categories[0]?.id;
                     DOM.listApp.inputPrice.value = p.defaultPrice || '';
                     DOM.modals.selectCatalog.classList.add('hidden'); 
                     DOM.modals.selectCatalog.classList.remove('flex');
