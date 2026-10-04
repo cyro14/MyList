@@ -120,8 +120,8 @@
                 </div>
             </header>
 
-            <!-- FAB: Floating Action Button fixed to bottom left of the main content area -->
-            <button id="fab-new-list" class="fixed md:absolute bottom-6 left-6 w-14 h-14 bg-white text-black rounded-full flex items-center justify-center shadow-[0_4px_24px_rgba(255,255,255,0.2)] hover:bg-neutral-200 hover:scale-105 active:scale-95 transition-all z-40" title="Criar Nova Lista">
+            <!-- FAB: Floating Action Button fixed to bottom RIGHT -->
+            <button id="fab-new-list" class="fixed md:absolute bottom-6 right-6 w-14 h-14 bg-white text-black rounded-full flex items-center justify-center shadow-[0_4px_24px_rgba(255,255,255,0.2)] hover:bg-neutral-200 hover:scale-105 active:scale-95 transition-all z-40" title="Criar Nova Lista">
                 <i class="ph ph-plus text-2xl font-bold"></i>
             </button>
 
@@ -158,27 +158,16 @@
                         </div>
                     </div>
 
-                    <!-- Add Item Form with Image Support -->
+                    <!-- Add Item Form without local image upload -->
                     <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-4 md:p-5 shadow-sm">
                         <form id="form-add-item" class="flex flex-col gap-4">
                             <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
                                 <div class="md:col-span-6 flex flex-col gap-1.5 relative">
                                     <div class="flex justify-between items-center w-full">
-                                        <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Item & Imagem</label>
+                                        <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Item</label>
                                         <button type="button" id="btn-open-catalog-add" class="text-[10px] text-blue-400 hover:text-blue-300 uppercase font-semibold flex items-center gap-1"><i class="ph ph-book-open"></i> Ver Catálogo</button>
                                     </div>
-                                    <div class="flex gap-2">
-                                        <!-- Image Upload Input -->
-                                        <label for="input-item-image" title="Adicionar Imagem" class="cursor-pointer w-10 h-10 flex-shrink-0 bg-neutral-950 border border-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-800 transition relative overflow-hidden">
-                                            <i class="ph ph-camera text-neutral-400" id="icon-item-image"></i>
-                                            <img id="preview-item-image" class="absolute inset-0 w-full h-full object-cover hidden">
-                                        </label>
-                                        <input type="file" id="input-item-image" accept="image/*" class="hidden">
-                                        <input type="hidden" id="input-item-image-base64">
-                                        
-                                        <!-- Name Input -->
-                                        <input type="text" id="input-item-name" required placeholder="Ex: Maçã Fuji" autocomplete="off" class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-neutral-500 transition-all">
-                                    </div>
+                                    <input type="text" id="input-item-name" required placeholder="Ex: Maçã Fuji" autocomplete="off" class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-neutral-500 transition-all">
                                     <ul id="product-suggestions" class="absolute top-[105%] left-0 right-0 bg-neutral-800 border border-neutral-700 rounded-lg shadow-xl max-h-48 overflow-y-auto hidden z-50 py-1"></ul>
                                 </div>
                                 <div class="md:col-span-3 flex flex-col gap-1.5">
@@ -242,7 +231,7 @@
                 <section id="view-products" class="view-section flex flex-col gap-6 hidden">
                     <div>
                         <h2 class="text-2xl font-bold text-white tracking-tight">Catálogo</h2>
-                        <p class="text-sm text-neutral-400 mt-1">Produtos salvos para agilizar suas listas.</p>
+                        <p class="text-sm text-neutral-400 mt-1">Produtos salvos automaticamente ao adicionar nas listas.</p>
                     </div>
                     <ul id="list-products" class="grid grid-cols-1 md:grid-cols-2 gap-3"></ul>
                 </section>
@@ -348,7 +337,7 @@
                                 <h3 class="text-base font-semibold text-white">Importar Dados</h3>
                                 <p class="text-xs text-neutral-400 mt-1">Restaure seus dados a partir de um arquivo JSON. Isso <span class="text-red-400 font-bold">sobrescreverá</span> os dados atuais!</p>
                             </div>
-                            <input type="file" id="input-import-data" accept=".json" class="hidden">
+                            <input type="file" id="input-import-data" class="hidden">
                             <button onclick="document.getElementById('input-import-data').click()" class="w-full bg-neutral-800 border border-neutral-700 hover:bg-neutral-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center justify-center gap-2 mt-auto">
                                 <i class="ph ph-upload-simple"></i> Selecionar Arquivo JSON
                             </button>
@@ -360,7 +349,7 @@
                     <div class="w-20 h-20 bg-neutral-900 border border-neutral-800 rounded-2xl flex items-center justify-center text-neutral-500 shadow-sm"><i class="ph ph-stack text-4xl"></i></div>
                     <div class="text-center max-w-xs">
                         <h2 class="text-xl font-semibold text-white mb-2">Nenhuma lista ativa</h2>
-                        <p class="text-sm text-neutral-400 leading-relaxed">Clique no botão flutuante '+' no canto inferior esquerdo para criar sua primeira lista.</p>
+                        <p class="text-sm text-neutral-400 leading-relaxed">Clique no botão flutuante '+' no canto inferior direito para criar sua primeira lista.</p>
                     </div>
                 </section>
 
@@ -534,8 +523,6 @@
                 inputName: document.getElementById('input-item-name'), inputCat: document.getElementById('input-item-category'),
                 inputQtd: document.getElementById('input-item-qtd'), inputUnit: document.getElementById('input-item-unit'),
                 inputPrice: document.getElementById('input-item-price'), suggestions: document.getElementById('product-suggestions'),
-                inputImage: document.getElementById('input-item-image'), previewImage: document.getElementById('preview-item-image'),
-                iconImage: document.getElementById('icon-item-image'), inputImageBase64: document.getElementById('input-item-image-base64'),
                 countPending: document.getElementById('count-pending'), countBought: document.getElementById('count-bought'),
                 btnOpenCatalog: document.getElementById('btn-open-catalog-add'), catalogSelectionList: document.getElementById('list-catalog-selection')
             },
@@ -600,29 +587,23 @@
         const fmtCurrency = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
         function escapeHtml(unsafe) { return (typeof unsafe !== 'string') ? unsafe : unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
 
-        function resizeImage(file, maxWidth = 100, maxHeight = 100) {
-            return new Promise((resolve, reject) => {
-                if (!file) return resolve(null);
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = event => {
-                    const img = new Image();
-                    img.src = event.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-                        if (width > height) { if (width > maxWidth) { height *= maxWidth / width; width = maxWidth; } } 
-                        else { if (height > maxHeight) { width *= maxHeight / height; height = maxHeight; } }
-                        canvas.width = width; canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', 0.7)); // compress
-                    };
-                    img.onerror = error => reject(error);
-                };
-                reader.onerror = error => reject(error);
-            });
+        // Dynamic online image generator using a deterministic hash
+        function getDynamicImageHTML(name, classes) {
+            if (!name) return '';
+            const keyword = encodeURIComponent(name.trim().split(' ')[0].toLowerCase() || 'item');
+            
+            // Simple string hash for repeatable results for the same word
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) {
+                hash = ((hash << 5) - hash) + name.charCodeAt(i);
+                hash = hash & hash;
+            }
+            hash = Math.abs(hash);
+
+            const primaryUrl = `https://loremflickr.com/100/100/${keyword}?lock=${hash}`;
+            const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=262626&color=e5e5e5`;
+            
+            return `<img src="${primaryUrl}" onerror="this.onerror=null;this.src='${fallbackUrl}'" class="${classes}" alt="img">`;
         }
 
         function syncUI() {
@@ -729,9 +710,7 @@
             const itemTotal = item.price ? (item.qtd * item.price) : 0;
             const priceHtml = item.price ? `<span class="text-sm font-semibold text-white ${item.isBought ? 'line-through-custom' : ''}">${fmtCurrency(itemTotal)}</span>` : `<button onclick="window.openPriceModal('${item.id}', '${escapeHtml(item.name).replace(/'/g, "\\'")}', false)" class="text-xs font-semibold tracking-wide text-neutral-400 bg-neutral-800 hover:text-white px-3 py-1.5 rounded-lg transition-colors border border-neutral-700 whitespace-nowrap">+ Valor</button>`;
             const cat = getCategoryDetails(item.categoryId || item.category);
-            
-            // Image logic
-            const imgHtml = item.image ? `<img src="${item.image}" class="w-10 h-10 object-cover rounded border border-neutral-700 flex-shrink-0" alt="img">` : '';
+            const imgHtml = getDynamicImageHTML(item.name, 'w-10 h-10 object-cover rounded border border-neutral-700 flex-shrink-0');
 
             li.innerHTML = `
                 <div class="flex items-center gap-3 md:gap-4 flex-1 overflow-hidden">
@@ -780,7 +759,7 @@
             [...appData.products].sort((a,b) => a.name.localeCompare(b.name)).forEach(p => {
                 const cat = getCategoryDetails(p.defaultCategoryId || p.defaultCategory);
                 const li = document.createElement('li'); li.className = "flex justify-between items-center p-4 rounded-xl border border-neutral-800 bg-neutral-900 shadow-sm gap-3";
-                const imgHtml = p.image ? `<img src="${p.image}" class="w-12 h-12 object-cover rounded border border-neutral-700 flex-shrink-0">` : '';
+                const imgHtml = getDynamicImageHTML(p.name, 'w-12 h-12 object-cover rounded border border-neutral-700 flex-shrink-0');
                 li.innerHTML = `
                     ${imgHtml}
                     <div class="flex flex-col truncate pr-2 flex-1">
@@ -854,7 +833,8 @@
                     const el = document.createElement('li'); el.className = "flex justify-between items-center p-3 rounded-lg border border-neutral-800 bg-neutral-950 shadow-sm cursor-pointer hover:border-blue-500 hover:bg-neutral-900 transition-all group gap-3";
                     el.setAttribute('onclick', `window.goToUnpaidItem('${ui.listId}', '${ui.id}', '${escapeHtml(ui.name).replace(/'/g, "\\'")}')`);
                     const estimatedText = ui.price ? fmtCurrency(ui.price * ui.qtd) : 'Sem valor'; const cat = getCategoryDetails(ui.categoryId || ui.category);
-                    const imgHtml = ui.image ? `<img src="${ui.image}" class="w-10 h-10 object-cover rounded border border-neutral-800 flex-shrink-0">` : '';
+                    const imgHtml = getDynamicImageHTML(ui.name, 'w-10 h-10 object-cover rounded border border-neutral-800 flex-shrink-0');
+                    
                     el.innerHTML = `
                         ${imgHtml}
                         <div class="flex flex-col truncate flex-1"><span class="font-medium text-white truncate text-sm group-hover:text-blue-400 transition-colors">${escapeHtml(ui.name)}</span><div class="flex items-center gap-1.5 mt-1 text-[11px] text-neutral-500"><span class="truncate max-w-[100px] border border-neutral-800 bg-neutral-900 px-1 rounded">${escapeHtml(ui.listName)}</span><span>&bull;</span><span style="color: ${cat.color}">${escapeHtml(cat.name)}</span></div></div>
@@ -883,7 +863,6 @@
                 DOM.modals.newList.classList.remove('hidden'); DOM.modals.newList.classList.add('flex'); setTimeout(() => document.getElementById('input-new-list-name').focus(), 50);
             };
 
-            // FAB setup
             DOM.fabNewList.addEventListener('click', () => openNewListModal());
 
             if(DOM.listApp.editSettingsBtn) DOM.listApp.editSettingsBtn.addEventListener('click', () => openNewListModal(appData.lists.find(l => l.id === appData.activeListId)));
@@ -911,7 +890,10 @@
                     showToast("Lista atualizada");
                 } else {
                     const newList = { id: generateId(), name, type, color, date, isRecurring, createdAt: Date.now(), lastResetMonth: isRecurring ? date.slice(0, 7) : null };
-                    appData.lists.push(newList); appData.activeListId = newList.id; showToast("Lista criada");
+                    appData.lists.push(newList); appData.activeListId = newList.id; 
+                    showToast("Lista criada");
+                    // Auto open list after creation
+                    switchView('list');
                 }
                 DOM.modals.newList.classList.add('hidden'); DOM.modals.newList.classList.remove('flex'); saveData();
             });
@@ -925,43 +907,18 @@
             };
             DOM.listApp.deleteBtn.addEventListener('click', deleteCurrentList); DOM.listApp.deleteBtnMobile.addEventListener('click', deleteCurrentList);
 
-            // Image input change handler for Add Item
-            DOM.listApp.inputImage.addEventListener('change', async (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    try {
-                        const base64 = await resizeImage(file);
-                        DOM.listApp.inputImageBase64.value = base64;
-                        DOM.listApp.previewImage.src = base64;
-                        DOM.listApp.previewImage.classList.remove('hidden');
-                        DOM.listApp.iconImage.classList.add('hidden');
-                    } catch (err) { showToast("Erro ao carregar imagem", true); }
-                } else { resetImageInput(); }
-            });
-
-            function resetImageInput() {
-                DOM.listApp.inputImage.value = ''; DOM.listApp.inputImageBase64.value = '';
-                DOM.listApp.previewImage.src = ''; DOM.listApp.previewImage.classList.add('hidden');
-                DOM.listApp.iconImage.classList.remove('hidden');
-            }
-
             DOM.forms.addItem.addEventListener('submit', (e) => {
                 e.preventDefault(); if(!appData.activeListId) return;
                 const name = DOM.listApp.inputName.value.trim(); const categoryId = DOM.listApp.inputCat.value; const qtd = parseFloat(DOM.listApp.inputQtd.value) || 1; const unit = DOM.listApp.inputUnit.value; const priceVal = DOM.listApp.inputPrice.value; const price = priceVal !== "" ? parseFloat(priceVal) : null;
-                const imgBase64 = DOM.listApp.inputImageBase64.value || null;
 
                 if(!name || !categoryId) return;
                 if (!appData.products.some(p => p.name.toLowerCase() === name.toLowerCase())) { 
-                    appData.products.push({ id: generateId(), name: name, defaultCategoryId: categoryId, defaultPrice: price, image: imgBase64, createdAt: Date.now() }); 
-                } else if(imgBase64) {
-                    // Update existing catalog product image if a new one is uploaded during list insertion
-                    const existingProduct = appData.products.find(p => p.name.toLowerCase() === name.toLowerCase());
-                    if(existingProduct && !existingProduct.image) existingProduct.image = imgBase64;
+                    appData.products.push({ id: generateId(), name: name, defaultCategoryId: categoryId, defaultPrice: price, createdAt: Date.now() }); 
                 }
                 
-                appData.items.push({ id: generateId(), listId: appData.activeListId, name, categoryId, qtd, unit, price, image: imgBase64, isBought: false, boughtAt: null, createdAt: Date.now() });
+                appData.items.push({ id: generateId(), listId: appData.activeListId, name, categoryId, qtd, unit, price, isBought: false, boughtAt: null, createdAt: Date.now() });
                 saveData(); 
-                DOM.listApp.inputName.value = ''; DOM.listApp.inputQtd.value = '1'; DOM.listApp.inputPrice.value = ''; resetImageInput();
+                DOM.listApp.inputName.value = ''; DOM.listApp.inputQtd.value = '1'; DOM.listApp.inputPrice.value = '';
                 DOM.listApp.inputName.focus(); DOM.listApp.suggestions.classList.add('hidden'); showToast("Item adicionado!");
             });
 
@@ -979,17 +936,12 @@
                 DOM.listApp.suggestions.innerHTML = '';
                 matches.forEach(m => {
                     const cat = getCategoryDetails(m.defaultCategoryId || m.defaultCategory); const li = document.createElement('li'); li.className = "px-4 py-2.5 hover:bg-neutral-700 cursor-pointer text-sm text-white border-b border-neutral-700/50 last:border-0 font-medium transition-colors flex justify-between items-center gap-3"; 
-                    const imgThumb = m.image ? `<img src="${m.image}" class="w-6 h-6 rounded object-cover">` : '';
+                    const imgThumb = getDynamicImageHTML(m.name, 'w-6 h-6 rounded object-cover');
+                    
                     li.innerHTML = `<div class="flex items-center gap-2">${imgThumb} <span>${escapeHtml(m.name)}</span></div> ${createCatBadgeHTML(cat)}`;
                     li.onclick = () => { 
                         DOM.listApp.inputName.value = m.name; DOM.listApp.inputCat.value = m.defaultCategoryId || m.defaultCategory || appData.categories[0]?.id; 
                         if(m.defaultPrice) DOM.listApp.inputPrice.value = m.defaultPrice; 
-                        if(m.image) {
-                            DOM.listApp.inputImageBase64.value = m.image;
-                            DOM.listApp.previewImage.src = m.image;
-                            DOM.listApp.previewImage.classList.remove('hidden');
-                            DOM.listApp.iconImage.classList.add('hidden');
-                        }
                         DOM.listApp.suggestions.classList.add('hidden'); DOM.listApp.inputQtd.focus(); 
                     };
                     DOM.listApp.suggestions.appendChild(li);
@@ -1017,13 +969,24 @@
             });
 
             DOM.settingsApp.inputImport.addEventListener('change', (event) => {
-                const file = event.target.files[0]; if (!file) return; const reader = new FileReader();
+                const file = event.target.files[0]; if (!file) return; 
+                const reader = new FileReader();
                 reader.onload = (e) => {
                     try {
                         const importedData = JSON.parse(e.target.result);
-                        if(importedData.categories && importedData.lists && importedData.items) { appData = importedData; saveData(); showToast("Dados restaurados com sucesso!"); } 
-                        else { throw new Error("Invalid format"); }
-                    } catch(err) { showToast("Erro ao ler o arquivo JSON.", true); }
+                        if(importedData.categories && importedData.lists && importedData.items) { 
+                            appData = importedData; 
+                            saveData(); 
+                            showToast("Dados restaurados com sucesso!"); 
+                        } else { 
+                            throw new Error("Invalid format"); 
+                        }
+                    } catch(err) { 
+                        showToast("Arquivo inválido. Por favor, selecione um backup válido do AnyList.", true); 
+                        console.error("Erro no Parse do JSON:", err);
+                    }
+                    // Reset value so same file can be chosen again
+                    DOM.settingsApp.inputImport.value = '';
                 };
                 reader.readAsText(file);
             });
@@ -1042,18 +1005,13 @@
             if(appData.products.length === 0) { list.innerHTML = '<div class="text-neutral-500 text-sm text-center py-8 bg-neutral-950 rounded-xl border border-neutral-800 border-dashed">Catálogo vazio.</div>'; return; }
             [...appData.products].sort((a,b) => a.name.localeCompare(b.name)).forEach(p => {
                 const cat = getCategoryDetails(p.defaultCategoryId || p.defaultCategory); const li = document.createElement('li'); li.className = "flex justify-between items-center px-4 py-3 bg-neutral-950 hover:bg-neutral-800 rounded-xl border border-neutral-800 cursor-pointer transition-colors shadow-sm group gap-3";
-                const imgHtml = p.image ? `<img src="${p.image}" class="w-10 h-10 object-cover rounded border border-neutral-700 flex-shrink-0">` : '';
+                const imgHtml = getDynamicImageHTML(p.name, 'w-10 h-10 object-cover rounded border border-neutral-700 flex-shrink-0');
+                
                 li.innerHTML = `
                     ${imgHtml}
                     <div class="flex flex-col truncate pr-2 flex-1"><span class="font-medium text-white truncate text-[15px] group-hover:text-blue-400 transition-colors">${escapeHtml(p.name)}</span><div class="flex items-center gap-2 mt-1.5 text-xs text-neutral-500">${createCatBadgeHTML(cat)}${p.defaultPrice ? `<span>&bull;</span><span>${fmtCurrency(p.defaultPrice)} un.</span>` : ''}</div></div><i class="ph ph-plus-circle text-xl text-neutral-500 group-hover:text-blue-400"></i>`;
                 li.onclick = () => { 
                     DOM.listApp.inputName.value = p.name; DOM.listApp.inputCat.value = p.defaultCategoryId || p.defaultCategory || appData.categories[0]?.id; DOM.listApp.inputPrice.value = p.defaultPrice || ''; 
-                    if(p.image) {
-                        DOM.listApp.inputImageBase64.value = p.image;
-                        DOM.listApp.previewImage.src = p.image;
-                        DOM.listApp.previewImage.classList.remove('hidden');
-                        DOM.listApp.iconImage.classList.add('hidden');
-                    }
                     DOM.modals.selectCatalog.classList.add('hidden'); DOM.modals.selectCatalog.classList.remove('flex'); DOM.listApp.inputQtd.focus(); 
                 };
                 list.appendChild(li);
