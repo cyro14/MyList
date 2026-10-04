@@ -23,9 +23,7 @@
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
-        body {
-            background-color: #0a0a0a; color: #e5e5e5; overflow-x: hidden; -webkit-tap-highlight-color: transparent;
-        }
+        body { background-color: #0a0a0a; color: #e5e5e5; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #404040; border-radius: 4px; }
@@ -37,7 +35,7 @@
         input[type="color"] { -webkit-appearance: none; border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; padding: 0; }
         input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
         input[type="color"]::-webkit-color-swatch { border: 2px solid #262626; border-radius: 8px; }
-        input[type="month"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+        input[type="month"]::-webkit-calendar-picker-indicator, input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
 
         .line-through-custom { text-decoration: line-through; color: #737373; }
         .layout-container { display: flex; height: 100vh; overflow: hidden; }
@@ -47,6 +45,10 @@
         @media (max-width: 768px) {
             .sidebar { position: fixed; height: 100vh; transform: translateX(-100%); }
             .sidebar.open { transform: translateX(0); box-shadow: 4px 0 24px rgba(0,0,0,0.8); }
+        }
+
+        .item-icon-wrapper {
+            border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s ease;
         }
 
         .hide-scroll::-webkit-scrollbar { display: none; }
@@ -64,35 +66,21 @@
         <aside id="sidebar" class="sidebar p-4 h-full flex flex-col gap-6 absolute md:relative">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3 px-2">
-                    <div class="w-8 h-8 bg-neutral-800 rounded-lg flex items-center justify-center text-white border border-neutral-700 shadow-sm">
-                        <i class="ph ph-stack text-lg"></i>
-                    </div>
+                    <div class="w-8 h-8 bg-neutral-800 rounded-lg flex items-center justify-center text-white border border-neutral-700 shadow-sm"><i class="ph ph-stack text-lg"></i></div>
                     <h1 class="font-semibold text-white tracking-tight text-base">AnyList</h1>
                 </div>
-                <button id="btn-close-sidebar" class="md:hidden text-neutral-400 hover:text-white p-2">
-                    <i class="ph ph-x text-xl"></i>
-                </button>
+                <button id="btn-close-sidebar" class="md:hidden text-neutral-400 hover:text-white p-2"><i class="ph ph-x text-xl"></i></button>
             </div>
 
             <div class="flex flex-col gap-1">
-                <button class="nav-btn w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors font-medium" data-target="products">
-                    <i class="ph ph-book-open text-lg"></i> Catálogo
-                </button>
-                <button class="nav-btn w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors font-medium" data-target="categories">
-                    <i class="ph ph-tag text-lg"></i> Categorias
-                </button>
-                <button class="nav-btn w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors font-medium" data-target="stats">
-                    <i class="ph ph-chart-bar text-lg"></i> Estatísticas
-                </button>
-                <button class="nav-btn w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors font-medium" data-target="settings">
-                    <i class="ph ph-gear text-lg"></i> Configurações
-                </button>
+                <button class="nav-btn w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors font-medium" data-target="products"><i class="ph ph-book-open text-lg"></i> Catálogo</button>
+                <button class="nav-btn w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors font-medium" data-target="categories"><i class="ph ph-tag text-lg"></i> Categorias</button>
+                <button class="nav-btn w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors font-medium" data-target="stats"><i class="ph ph-chart-bar text-lg"></i> Estatísticas</button>
+                <button class="nav-btn w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors font-medium" data-target="settings"><i class="ph ph-gear text-lg"></i> Configurações</button>
             </div>
 
             <div class="flex flex-col gap-2 flex-1 overflow-y-auto hide-scroll mt-2">
-                <div class="flex items-center justify-between px-2 text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">
-                    <span class="flex items-center gap-2"><i class="ph ph-list"></i> Listas</span>
-                </div>
+                <div class="flex items-center justify-between px-2 text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2"><span class="flex items-center gap-2"><i class="ph ph-list"></i> Listas</span></div>
                 
                 <div class="px-2 flex flex-col gap-2 mb-2">
                     <div class="relative">
@@ -120,7 +108,6 @@
                 </div>
             </header>
 
-            <!-- FAB: Floating Action Button fixed to bottom RIGHT -->
             <button id="fab-new-list" class="fixed md:absolute bottom-6 right-6 w-14 h-14 bg-white text-black rounded-full flex items-center justify-center shadow-[0_4px_24px_rgba(255,255,255,0.2)] hover:bg-neutral-200 hover:scale-105 active:scale-95 transition-all z-40" title="Criar Nova Lista">
                 <i class="ph ph-plus text-2xl font-bold"></i>
             </button>
@@ -158,7 +145,6 @@
                         </div>
                     </div>
 
-                    <!-- Add Item Form without local image upload -->
                     <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-4 md:p-5 shadow-sm">
                         <form id="form-add-item" class="flex flex-col gap-4">
                             <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
@@ -380,10 +366,19 @@
                         <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Nome da Lista</label>
                         <input type="text" id="input-new-list-name" required placeholder="Ex: Mercado..." autocomplete="off" class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-neutral-500 transition-all">
                     </div>
-                    <div class="flex flex-col gap-1.5">
-                        <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Cor</label>
-                        <div class="bg-neutral-950 border border-neutral-800 rounded-lg p-1.5 flex items-center justify-center h-[46px] w-[52px]">
-                            <input type="color" id="input-new-list-color" value="#3b82f6" required>
+                    <div class="flex gap-2 sm:gap-3">
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Ícone</label>
+                            <input type="hidden" id="input-new-list-icon" value="ph-list-bullets">
+                            <button type="button" id="btn-select-list-icon" onclick="window.openIconModal('listForm')" class="bg-neutral-950 border border-neutral-800 rounded-lg flex items-center justify-center h-[46px] w-[52px] text-xl text-neutral-400 hover:text-white hover:border-neutral-500 transition-all focus:outline-none">
+                                <i class="ph ph-list-bullets" id="display-new-list-icon"></i>
+                            </button>
+                        </div>
+                        <div class="flex flex-col gap-1.5">
+                            <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Cor</label>
+                            <div class="bg-neutral-950 border border-neutral-800 rounded-lg p-1.5 flex items-center justify-center h-[46px] w-[52px]">
+                                <input type="color" id="input-new-list-color" value="#3b82f6" required>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -434,6 +429,22 @@
             </div>
             <div class="p-4 overflow-y-auto hide-scroll flex-1">
                 <ul id="list-catalog-selection" class="flex flex-col gap-2"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: ICON SELECTOR -->
+    <div id="modal-icon-selector" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex-col items-center justify-center z-[9999] p-4 transition-opacity">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+            <div class="px-6 py-5 border-b border-neutral-800 flex justify-between items-center bg-neutral-900/50">
+                <h3 class="font-semibold text-white tracking-tight flex items-center gap-2"><i class="ph ph-star text-amber-400"></i> Selecionar Ícone</h3>
+                <button class="btn-close-modal text-neutral-500 hover:text-white p-1 rounded-md hover:bg-neutral-800 transition-colors"><i class="ph ph-x"></i></button>
+            </div>
+            <div class="p-4 overflow-y-auto hide-scroll flex-1">
+                <div id="icon-grid" class="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-8 gap-3"></div>
+            </div>
+            <div class="p-4 border-t border-neutral-800 flex justify-end">
+                <button id="btn-reset-icon" class="text-sm text-neutral-400 hover:text-white px-4 py-2 rounded-lg bg-neutral-800 transition-colors">Remover Personalização (Auto)</button>
             </div>
         </div>
     </div>
@@ -508,7 +519,12 @@
                 categories: document.getElementById('view-categories'), stats: document.getElementById('view-stats'),
                 settings: document.getElementById('view-settings'), empty: document.getElementById('view-empty-lists')
             },
-            modals: { newList: document.getElementById('modal-new-list'), addPrice: document.getElementById('modal-add-price'), selectCatalog: document.getElementById('modal-select-catalog') },
+            modals: { 
+                newList: document.getElementById('modal-new-list'), 
+                addPrice: document.getElementById('modal-add-price'), 
+                selectCatalog: document.getElementById('modal-select-catalog'),
+                iconSelector: document.getElementById('modal-icon-selector') 
+            },
             forms: { addItem: document.getElementById('form-add-item'), newList: document.getElementById('form-new-list'), addCategory: document.getElementById('form-add-category'), addPrice: document.getElementById('form-add-price') },
             listApp: {
                 title: document.getElementById('current-list-title'), typeBadge: document.getElementById('current-list-type-badge'), mobileTitle: document.getElementById('mobile-header-title'),
@@ -540,6 +556,22 @@
             },
             fabNewList: document.getElementById('fab-new-list')
         };
+
+        const iconLibrary = [
+            'ph-list-bullets', 'ph-shopping-bag', 'ph-shopping-cart', 'ph-apple-logo', 'ph-carrot', 'ph-bowl-food', 'ph-bread', 'ph-croissant',
+            'ph-drop', 'ph-cheese', 'ph-beer-bottle', 'ph-wine', 'ph-martini', 'ph-brandy', 'ph-coffee', 'ph-egg', 'ph-meat', 'ph-bone', 'ph-fish-simple',
+            'ph-hamburger', 'ph-pizza', 'ph-french-fries', 'ph-cake', 'ph-ice-cream', 'ph-cookie', 'ph-orange-slice', 'ph-lemon', 'ph-plant', 'ph-leaf', 'ph-tree', 'ph-tree-evergreen',
+            'ph-sparkle', 'ph-toilet-paper', 'ph-receipt', 'ph-lightbulb', 'ph-wifi-high', 'ph-house-line',
+            'ph-play-circle', 'ph-money', 'ph-storefront', 'ph-pill', 'ph-paw-print', 'ph-game-controller',
+            'ph-t-shirt', 'ph-car', 'ph-airplane', 'ph-baby', 'ph-barbell', 'ph-basket', 'ph-bicycle', 'ph-motorcycle', 'ph-taxi', 'ph-jeep', 'ph-bus', 'ph-train', 'ph-gas-pump', 'ph-steering-wheel',
+            'ph-book', 'ph-briefcase', 'ph-camera', 'ph-computer-tower', 'ph-credit-card',
+            'ph-device-mobile', 'ph-first-aid', 'ph-gift', 'ph-confetti', 'ph-balloon', 'ph-star', 'ph-tent', 'ph-graduation-cap',
+            'ph-heart', 'ph-key', 'ph-knife', 'ph-laptop', 'ph-map-pin', 'ph-monitor', 'ph-package',
+            'ph-pencil', 'ph-scissors', 'ph-sneaker', 'ph-suitcase', 
+            'ph-umbrella', 'ph-wrench', 'ph-hammer', 'ph-warning', 'ph-siren'
+        ];
+
+        let currentIconSelection = { type: null, id: null };
 
         function loadData() {
             const stored = localStorage.getItem(STORAGE_KEY);
@@ -587,24 +619,97 @@
         const fmtCurrency = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
         function escapeHtml(unsafe) { return (typeof unsafe !== 'string') ? unsafe : unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
 
-        // Dynamic online image generator using a deterministic hash
-        function getDynamicImageHTML(name, classes) {
-            if (!name) return '';
-            const keyword = encodeURIComponent(name.trim().split(' ')[0].toLowerCase() || 'item');
+        function getIconForWord(word) {
+            if (!word) return 'ph-shopping-bag';
+            const cleanWord = word.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
             
-            // Simple string hash for repeatable results for the same word
-            let hash = 0;
-            for (let i = 0; i < name.length; i++) {
-                hash = ((hash << 5) - hash) + name.charCodeAt(i);
-                hash = hash & hash;
-            }
-            hash = Math.abs(hash);
+            const map = [
+                { keys: ['banana', 'maca', 'uva', 'morango', 'fruta', 'laranja', 'limao', 'mamao'], icon: 'ph-apple-logo' },
+                { keys: ['carne', 'frango', 'bife', 'porco', 'linguica', 'salsicha'], icon: 'ph-meat' },
+                { keys: ['peixe', 'atum', 'sardinha', 'salmao'], icon: 'ph-fish-simple' },
+                { keys: ['pao', 'bolo', 'trigo', 'biscoito', 'bolacha', 'torta'], icon: 'ph-bread' },
+                { keys: ['leite', 'iogurte', 'creme', 'agua'], icon: 'ph-drop' },
+                { keys: ['queijo', 'manteiga', 'requeijao', 'margarina'], icon: 'ph-cheese' },
+                { keys: ['suco', 'refrigerante', 'cerveja', 'coca', 'guarana', 'bebida', 'refris'], icon: 'ph-beer-bottle' },
+                { keys: ['vinho', 'espumante'], icon: 'ph-wine' },
+                { keys: ['ovo', 'ovos'], icon: 'ph-egg' },
+                { keys: ['arroz', 'feijao', 'macarrao', 'sopa', 'milho', 'aveia', 'cafe'], icon: 'ph-bowl-food' },
+                { keys: ['alface', 'tomate', 'cebola', 'alho', 'verdura', 'legume', 'batata', 'cenoura', 'salada'], icon: 'ph-carrot' },
+                { keys: ['sabao', 'detergente', 'amaciante', 'limpeza', 'vassoura', 'rodo', 'desinfetante'], icon: 'ph-sparkle' },
+                { keys: ['papel', 'pasta', 'shampoo', 'sabonete', 'condicionador', 'desodorante', 'higiene'], icon: 'ph-toilet-paper' },
+                { keys: ['conta', 'boleto', 'imposto', 'taxa', 'fatura'], icon: 'ph-receipt' },
+                { keys: ['luz', 'energia'], icon: 'ph-lightbulb' },
+                { keys: ['internet', 'wifi'], icon: 'ph-wifi-high' },
+                { keys: ['aluguel', 'casa', 'condominio'], icon: 'ph-house-line' },
+                { keys: ['assinatura', 'netflix', 'spotify', 'amazon', 'prime', 'hbo', 'disney'], icon: 'ph-play-circle' },
+                { keys: ['salario', 'freela', 'entrada', 'dinheiro', 'pix', 'renda', 'pagamento'], icon: 'ph-money' },
+                { keys: ['venda', 'cliente', 'loja'], icon: 'ph-storefront' },
+                { keys: ['remedio', 'farmacia', 'medicamento', 'comprimido', 'dorflex'], icon: 'ph-pill' },
+                { keys: ['racao', 'cachorro', 'gato', 'pet', 'areia'], icon: 'ph-paw-print' },
+                { keys: ['jogo', 'game', 'xbox', 'playstation', 'nintendo', 'steam'], icon: 'ph-game-controller' },
+                { keys: ['roupa', 'tenis', 'sapato', 'camisa', 'camiseta', 'calca', 'meia'], icon: 'ph-t-shirt' }
+            ];
 
-            const primaryUrl = `https://loremflickr.com/100/100/${keyword}?lock=${hash}`;
-            const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=262626&color=e5e5e5`;
-            
-            return `<img src="${primaryUrl}" onerror="this.onerror=null;this.src='${fallbackUrl}'" class="${classes}" alt="img">`;
+            for (let i = 0; i < map.length; i++) {
+                if (map[i].keys.some(k => cleanWord.includes(k))) return map[i].icon;
+            }
+            return 'ph-package';
         }
+
+        function getIconHTML(name, color = '#a3a3a3', extraClasses = 'w-10 h-10 text-[22px]', customIcon = null, onClickAttr = '') {
+            const iconClass = customIcon || getIconForWord(name);
+            const bg = hexToRgba(color, 0.15);
+            const borderColor = hexToRgba(color, 0.3);
+            const cursorClass = onClickAttr ? 'cursor-pointer hover:opacity-70 active:scale-95' : '';
+            return `<div ${onClickAttr} class="item-icon-wrapper ${extraClasses} ${cursorClass}" style="background-color: ${bg}; border: 1px solid ${borderColor}; color: ${color};"><i class="ph ${iconClass}"></i></div>`;
+        }
+
+        window.openIconModal = (type, id) => {
+            currentIconSelection = { type, id };
+            const grid = document.getElementById('icon-grid');
+            grid.innerHTML = '';
+            
+            iconLibrary.forEach(iconClass => {
+                const btn = document.createElement('button');
+                btn.className = "w-full aspect-square flex items-center justify-center rounded-xl bg-neutral-800 border border-neutral-700 text-neutral-300 hover:text-white hover:bg-neutral-700 hover:border-blue-500 transition-all text-2xl shadow-sm";
+                btn.innerHTML = `<i class="ph ${iconClass}"></i>`;
+                btn.onclick = () => window.selectCustomIcon(iconClass);
+                grid.appendChild(btn);
+            });
+            DOM.modals.iconSelector.classList.remove('hidden');
+            DOM.modals.iconSelector.classList.add('flex');
+        };
+
+        window.selectCustomIcon = (iconClass) => {
+            const { type, id } = currentIconSelection;
+            if (type === 'listForm') {
+                const finalIcon = iconClass || 'ph-list-bullets';
+                document.getElementById('input-new-list-icon').value = finalIcon;
+                document.getElementById('display-new-list-icon').className = `ph ${finalIcon}`;
+            } else if (type === 'item') {
+                const item = appData.items.find(i => i.id === id);
+                if (item) {
+                    item.customIcon = iconClass;
+                    const product = appData.products.find(p => p.name.toLowerCase() === item.name.toLowerCase());
+                    if (product) product.customIcon = iconClass;
+                }
+            } else if (type === 'product') {
+                const product = appData.products.find(p => p.id === id);
+                if (product) {
+                    product.customIcon = iconClass;
+                    appData.items.forEach(i => {
+                        if (i.name.toLowerCase() === product.name.toLowerCase()) {
+                            i.customIcon = iconClass;
+                        }
+                    });
+                }
+            }
+            saveData();
+            DOM.modals.iconSelector.classList.add('hidden');
+            DOM.modals.iconSelector.classList.remove('flex');
+        };
+
+        document.getElementById('btn-reset-icon').onclick = () => window.selectCustomIcon(null);
 
         function syncUI() {
             updateCategorySelects();
@@ -637,7 +742,9 @@
                 if(listEl) listEl.classList.add('bg-neutral-800', 'text-white');
                 const activeList = appData.lists.find(l => l.id === appData.activeListId);
                 if(activeList) {
-                    DOM.listApp.title.textContent = activeList.name; DOM.listApp.mobileTitle.textContent = activeList.name;
+                    const listIcon = activeList.customIcon || 'ph-list-bullets';
+                    DOM.listApp.title.innerHTML = `<i class="ph ${listIcon} mr-2"></i>${escapeHtml(activeList.name)}`; 
+                    DOM.listApp.mobileTitle.innerHTML = `<i class="ph ${listIcon} mr-1.5 text-lg"></i>${escapeHtml(activeList.name)}`;
                     DOM.listApp.inputDate.value = activeList.date || getTodayDateStr(); DOM.listApp.inputDateMobile.value = activeList.date || getTodayDateStr();
                     DOM.listApp.recurrenceBadge.classList.toggle('hidden', !activeList.isRecurring);
                     const listTypeColor = activeList.type === 'entrada' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' : 'text-neutral-300 bg-neutral-800 border-neutral-700';
@@ -676,7 +783,8 @@
                 btn.className = `sidebar-list-item w-full text-left px-3 py-2.5 rounded-lg flex items-center justify-between text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors truncate font-medium border-l-[3px] ${isActive ? 'bg-neutral-800 text-white' : 'border-transparent'}`;
                 const listColor = list.color || '#3b82f6'; if(isActive) btn.style.borderColor = listColor;
                 const typeIcon = list.type === 'entrada' ? '<i class="ph ph-arrow-down-left text-emerald-400"></i>' : '';
-                btn.innerHTML = `<div class="flex items-center gap-3 truncate"><div class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-sm" style="background-color: ${listColor}"></div><span class="truncate flex items-center gap-1">${escapeHtml(list.name)} ${typeIcon}</span></div>${list.isRecurring ? '<i class="ph ph-arrows-clockwise text-xs text-blue-400 flex-shrink-0"></i>' : ''}`;
+                const listIcon = list.customIcon || 'ph-list-bullets';
+                btn.innerHTML = `<div class="flex items-center gap-3 truncate"><i class="ph ${listIcon} text-lg flex-shrink-0" style="color: ${listColor}"></i><span class="truncate flex items-center gap-1">${escapeHtml(list.name)} ${typeIcon}</span></div>${list.isRecurring ? '<i class="ph ph-arrows-clockwise text-xs text-blue-400 flex-shrink-0"></i>' : ''}`;
                 btn.onmouseenter = () => { if(!isActive) btn.style.borderColor = listColor; };
                 btn.onmouseleave = () => { if(!isActive) btn.style.borderColor = 'transparent'; };
                 btn.onclick = () => { appData.activeListId = list.id; saveData(); switchView('list'); };
@@ -710,7 +818,7 @@
             const itemTotal = item.price ? (item.qtd * item.price) : 0;
             const priceHtml = item.price ? `<span class="text-sm font-semibold text-white ${item.isBought ? 'line-through-custom' : ''}">${fmtCurrency(itemTotal)}</span>` : `<button onclick="window.openPriceModal('${item.id}', '${escapeHtml(item.name).replace(/'/g, "\\'")}', false)" class="text-xs font-semibold tracking-wide text-neutral-400 bg-neutral-800 hover:text-white px-3 py-1.5 rounded-lg transition-colors border border-neutral-700 whitespace-nowrap">+ Valor</button>`;
             const cat = getCategoryDetails(item.categoryId || item.category);
-            const imgHtml = getDynamicImageHTML(item.name, 'w-10 h-10 object-cover rounded border border-neutral-700 flex-shrink-0');
+            const imgHtml = getIconHTML(item.name, cat.color, 'w-10 h-10 text-[22px]', item.customIcon, `onclick="window.openIconModal('item', '${item.id}')"`);
 
             li.innerHTML = `
                 <div class="flex items-center gap-3 md:gap-4 flex-1 overflow-hidden">
@@ -759,7 +867,7 @@
             [...appData.products].sort((a,b) => a.name.localeCompare(b.name)).forEach(p => {
                 const cat = getCategoryDetails(p.defaultCategoryId || p.defaultCategory);
                 const li = document.createElement('li'); li.className = "flex justify-between items-center p-4 rounded-xl border border-neutral-800 bg-neutral-900 shadow-sm gap-3";
-                const imgHtml = getDynamicImageHTML(p.name, 'w-12 h-12 object-cover rounded border border-neutral-700 flex-shrink-0');
+                const imgHtml = getIconHTML(p.name, cat.color, 'w-10 h-10 text-[22px]', p.customIcon, `onclick="window.openIconModal('product', '${p.id}')"`);
                 li.innerHTML = `
                     ${imgHtml}
                     <div class="flex flex-col truncate pr-2 flex-1">
@@ -833,7 +941,7 @@
                     const el = document.createElement('li'); el.className = "flex justify-between items-center p-3 rounded-lg border border-neutral-800 bg-neutral-950 shadow-sm cursor-pointer hover:border-blue-500 hover:bg-neutral-900 transition-all group gap-3";
                     el.setAttribute('onclick', `window.goToUnpaidItem('${ui.listId}', '${ui.id}', '${escapeHtml(ui.name).replace(/'/g, "\\'")}')`);
                     const estimatedText = ui.price ? fmtCurrency(ui.price * ui.qtd) : 'Sem valor'; const cat = getCategoryDetails(ui.categoryId || ui.category);
-                    const imgHtml = getDynamicImageHTML(ui.name, 'w-10 h-10 object-cover rounded border border-neutral-800 flex-shrink-0');
+                    const imgHtml = getIconHTML(ui.name, cat.color, 'w-10 h-10 text-[22px]', ui.customIcon); // no onclick here to avoid nested routing
                     
                     el.innerHTML = `
                         ${imgHtml}
@@ -853,11 +961,14 @@
                 if (listToEdit) {
                     titleHeader.textContent = "Editar Lista"; submitBtn.textContent = "Salvar Alterações";
                     document.getElementById('input-new-list-name').value = listToEdit.name; document.getElementById('input-new-list-type').value = listToEdit.type || 'despesa';
+                    document.getElementById('input-new-list-icon').value = listToEdit.customIcon || 'ph-list-bullets';
+                    document.getElementById('display-new-list-icon').className = `ph ${listToEdit.customIcon || 'ph-list-bullets'}`;
                     document.getElementById('input-new-list-color').value = listToEdit.color || '#3b82f6'; document.getElementById('input-new-list-date').value = listToEdit.date || getTodayDateStr();
                     document.getElementById('input-new-list-recurring').checked = !!listToEdit.isRecurring; document.getElementById('input-edit-list-id').value = listToEdit.id;
                 } else {
                     titleHeader.textContent = "Criar Nova Lista"; submitBtn.textContent = "Criar Lista";
                     document.getElementById('form-new-list').reset(); document.getElementById('input-new-list-color').value = '#3b82f6';
+                    document.getElementById('input-new-list-icon').value = 'ph-list-bullets'; document.getElementById('display-new-list-icon').className = 'ph ph-list-bullets';
                     document.getElementById('input-new-list-date').value = getTodayDateStr(); document.getElementById('input-edit-list-id').value = "";
                 }
                 DOM.modals.newList.classList.remove('hidden'); DOM.modals.newList.classList.add('flex'); setTimeout(() => document.getElementById('input-new-list-name').focus(), 50);
@@ -883,16 +994,16 @@
             DOM.forms.newList.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const name = document.getElementById('input-new-list-name').value.trim(); const type = document.getElementById('input-new-list-type').value; const color = document.getElementById('input-new-list-color').value; const date = document.getElementById('input-new-list-date').value || getTodayDateStr(); const isRecurring = document.getElementById('input-new-list-recurring').checked; const editId = document.getElementById('input-edit-list-id').value;
+                const customIcon = document.getElementById('input-new-list-icon').value || 'ph-list-bullets';
                 if(!name) return;
                 if (editId) {
                     const list = appData.lists.find(l => l.id === editId);
-                    if(list) { list.name = name; list.type = type; list.color = color; list.date = date; list.isRecurring = isRecurring; }
+                    if(list) { list.name = name; list.type = type; list.color = color; list.date = date; list.isRecurring = isRecurring; list.customIcon = customIcon; }
                     showToast("Lista atualizada");
                 } else {
-                    const newList = { id: generateId(), name, type, color, date, isRecurring, createdAt: Date.now(), lastResetMonth: isRecurring ? date.slice(0, 7) : null };
+                    const newList = { id: generateId(), name, type, color, date, isRecurring, customIcon, createdAt: Date.now(), lastResetMonth: isRecurring ? date.slice(0, 7) : null };
                     appData.lists.push(newList); appData.activeListId = newList.id; 
                     showToast("Lista criada");
-                    // Auto open list after creation
                     switchView('list');
                 }
                 DOM.modals.newList.classList.add('hidden'); DOM.modals.newList.classList.remove('flex'); saveData();
@@ -912,11 +1023,13 @@
                 const name = DOM.listApp.inputName.value.trim(); const categoryId = DOM.listApp.inputCat.value; const qtd = parseFloat(DOM.listApp.inputQtd.value) || 1; const unit = DOM.listApp.inputUnit.value; const priceVal = DOM.listApp.inputPrice.value; const price = priceVal !== "" ? parseFloat(priceVal) : null;
 
                 if(!name || !categoryId) return;
-                if (!appData.products.some(p => p.name.toLowerCase() === name.toLowerCase())) { 
-                    appData.products.push({ id: generateId(), name: name, defaultCategoryId: categoryId, defaultPrice: price, createdAt: Date.now() }); 
+                let linkedProduct = appData.products.find(p => p.name.toLowerCase() === name.toLowerCase());
+                if (!linkedProduct) { 
+                    linkedProduct = { id: generateId(), name: name, defaultCategoryId: categoryId, defaultPrice: price, customIcon: null, createdAt: Date.now() };
+                    appData.products.push(linkedProduct); 
                 }
                 
-                appData.items.push({ id: generateId(), listId: appData.activeListId, name, categoryId, qtd, unit, price, isBought: false, boughtAt: null, createdAt: Date.now() });
+                appData.items.push({ id: generateId(), listId: appData.activeListId, name, categoryId, qtd, unit, price, customIcon: linkedProduct.customIcon, isBought: false, boughtAt: null, createdAt: Date.now() });
                 saveData(); 
                 DOM.listApp.inputName.value = ''; DOM.listApp.inputQtd.value = '1'; DOM.listApp.inputPrice.value = '';
                 DOM.listApp.inputName.focus(); DOM.listApp.suggestions.classList.add('hidden'); showToast("Item adicionado!");
@@ -936,7 +1049,7 @@
                 DOM.listApp.suggestions.innerHTML = '';
                 matches.forEach(m => {
                     const cat = getCategoryDetails(m.defaultCategoryId || m.defaultCategory); const li = document.createElement('li'); li.className = "px-4 py-2.5 hover:bg-neutral-700 cursor-pointer text-sm text-white border-b border-neutral-700/50 last:border-0 font-medium transition-colors flex justify-between items-center gap-3"; 
-                    const imgThumb = getDynamicImageHTML(m.name, 'w-6 h-6 rounded object-cover');
+                    const imgThumb = getIconHTML(m.name, cat.color, 'w-6 h-6 text-[15px]', m.customIcon);
                     
                     li.innerHTML = `<div class="flex items-center gap-2">${imgThumb} <span>${escapeHtml(m.name)}</span></div> ${createCatBadgeHTML(cat)}`;
                     li.onclick = () => { 
@@ -985,7 +1098,6 @@
                         showToast("Arquivo inválido. Por favor, selecione um backup válido do AnyList.", true); 
                         console.error("Erro no Parse do JSON:", err);
                     }
-                    // Reset value so same file can be chosen again
                     DOM.settingsApp.inputImport.value = '';
                 };
                 reader.readAsText(file);
@@ -1005,7 +1117,7 @@
             if(appData.products.length === 0) { list.innerHTML = '<div class="text-neutral-500 text-sm text-center py-8 bg-neutral-950 rounded-xl border border-neutral-800 border-dashed">Catálogo vazio.</div>'; return; }
             [...appData.products].sort((a,b) => a.name.localeCompare(b.name)).forEach(p => {
                 const cat = getCategoryDetails(p.defaultCategoryId || p.defaultCategory); const li = document.createElement('li'); li.className = "flex justify-between items-center px-4 py-3 bg-neutral-950 hover:bg-neutral-800 rounded-xl border border-neutral-800 cursor-pointer transition-colors shadow-sm group gap-3";
-                const imgHtml = getDynamicImageHTML(p.name, 'w-10 h-10 object-cover rounded border border-neutral-700 flex-shrink-0');
+                const imgHtml = getIconHTML(p.name, cat.color, 'w-10 h-10 text-[22px]', p.customIcon);
                 
                 li.innerHTML = `
                     ${imgHtml}
