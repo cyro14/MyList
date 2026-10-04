@@ -13,48 +13,36 @@
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        neutral: {
-                            850: '#1f1f1f',
-                            900: '#171717',
-                            950: '#0a0a0a',
-                        }
+                        neutral: { 850: '#1f1f1f', 900: '#171717', 950: '#0a0a0a' }
                     }
                 }
             }
         }
     </script>
-    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
     <style>
         body {
-            background-color: #0a0a0a;
-            color: #e5e5e5;
-            overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
+            background-color: #0a0a0a; color: #e5e5e5; overflow-x: hidden; -webkit-tap-highlight-color: transparent;
         }
-        
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #404040; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #525252; }
 
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
-
-        input[type="color"] {
-            -webkit-appearance: none; border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; padding: 0;
-        }
+        
+        input[type="color"] { -webkit-appearance: none; border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; padding: 0; }
         input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
         input[type="color"]::-webkit-color-swatch { border: 2px solid #262626; border-radius: 8px; }
+        input[type="month"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
 
         .line-through-custom { text-decoration: line-through; color: #737373; }
-        
         .layout-container { display: flex; height: 100vh; overflow: hidden; }
-        .sidebar { width: 260px; background-color: #171717; border-right: 1px solid #262626; display: flex; flex-direction: column; transition: transform 0.3s ease; z-index: 40; }
-        .main-content { flex: 1; overflow-y: auto; background-color: #0a0a0a; display: flex; flex-direction: column; }
+        .sidebar { width: 280px; background-color: #171717; border-right: 1px solid #262626; display: flex; flex-direction: column; transition: transform 0.3s ease; z-index: 40; }
+        .main-content { flex: 1; overflow-y: auto; background-color: #0a0a0a; display: flex; flex-direction: column; position: relative; }
         
         @media (max-width: 768px) {
             .sidebar { position: fixed; height: 100vh; transform: translateX(-100%); }
@@ -71,7 +59,6 @@
 <body class="antialiased text-sm">
 
     <div class="layout-container relative">
-        
         <div id="mobile-overlay" class="fixed inset-0 bg-black/50 z-30 hidden md:hidden backdrop-blur-sm transition-opacity opacity-0"></div>
 
         <aside id="sidebar" class="sidebar p-4 h-full flex flex-col gap-6 absolute md:relative">
@@ -89,57 +76,56 @@
 
             <div class="flex flex-col gap-1">
                 <button class="nav-btn w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors font-medium" data-target="products">
-                    <i class="ph ph-package text-lg"></i> Catálogo
+                    <i class="ph ph-book-open text-lg"></i> Catálogo
                 </button>
                 <button class="nav-btn w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors font-medium" data-target="categories">
                     <i class="ph ph-tag text-lg"></i> Categorias
                 </button>
                 <button class="nav-btn w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors font-medium" data-target="stats">
-                    <i class="ph ph-chart-pie-slice text-lg"></i> Estatísticas
+                    <i class="ph ph-chart-bar text-lg"></i> Estatísticas
+                </button>
+                <button class="nav-btn w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors font-medium" data-target="settings">
+                    <i class="ph ph-gear text-lg"></i> Configurações
                 </button>
             </div>
 
             <div class="flex flex-col gap-2 flex-1 overflow-y-auto hide-scroll mt-2">
                 <div class="flex items-center justify-between px-2 text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">
-                    <span>Listas</span>
-                    <button id="btn-show-new-list" class="hover:text-white transition-colors bg-neutral-800 hover:bg-neutral-700 p-1.5 rounded-md flex items-center justify-center"><i class="ph ph-plus"></i></button>
+                    <span class="flex items-center gap-2"><i class="ph ph-list"></i> Listas</span>
                 </div>
+                
                 <div class="px-2 flex flex-col gap-2 mb-2">
                     <div class="relative">
                         <i class="ph ph-magnifying-glass absolute left-2.5 top-1/2 transform -translate-y-1/2 text-neutral-500"></i>
-                        <input type="text" id="input-search-lists" placeholder="Buscar listas..." class="w-full bg-neutral-900 border border-neutral-800 rounded-md pl-8 pr-2 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600 transition-colors">
+                        <input type="text" id="sidebar-search" placeholder="Buscar listas..." class="w-full bg-neutral-900 border border-neutral-800 rounded-md pl-8 pr-2 py-1.5 text-xs text-white focus:outline-none focus:border-neutral-600 transition-colors">
                     </div>
-                    <select id="select-sort-lists" class="w-full bg-neutral-900 border border-neutral-800 rounded-md px-2 py-1.5 text-xs text-neutral-400 focus:outline-none focus:border-neutral-600 transition-colors cursor-pointer">
-                        <option value="desc">Mais Recentes</option>
-                        <option value="asc">Mais Antigas</option>
-                        <option value="az">A-Z</option>
-                    </select>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="month" id="sidebar-month-filter" title="Filtrar por mês" class="w-full bg-neutral-900 border border-neutral-800 rounded-md px-2 py-1.5 text-xs text-neutral-400 focus:outline-none focus:border-neutral-600 transition-colors cursor-pointer">
+                        <select id="sidebar-sort" class="w-full bg-neutral-900 border border-neutral-800 rounded-md px-1 py-1.5 text-xs text-neutral-400 focus:outline-none focus:border-neutral-600 transition-colors cursor-pointer">
+                            <option value="desc">Mais Recentes</option>
+                            <option value="asc">Mais Antigas</option>
+                            <option value="az">A-Z</option>
+                        </select>
+                    </div>
                 </div>
-                <div id="sidebar-lists" class="flex flex-col gap-1"></div>
-            </div>
-
-            <div class="mt-auto flex flex-col gap-2">
-                <button id="btn-install-app" class="hidden w-full bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 border border-blue-600/30 text-left px-3 py-2.5 rounded-lg flex items-center gap-3 transition-colors font-medium">
-                    <i class="ph ph-download-simple text-lg"></i> Instalar App
-                </button>
-                <div class="px-3 py-3 border-t border-neutral-800/50 text-xs text-neutral-500 flex items-center gap-2 bg-neutral-900/50 rounded-lg">
-                    <div class="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></div> Local Storage
-                </div>
+                <div id="sidebar-lists" class="flex flex-col gap-1 pb-20"></div>
             </div>
         </aside>
 
-        <main class="main-content relative w-full">
-            
+        <main class="main-content relative w-full pb-24">
             <header class="md:hidden flex items-center justify-between p-4 border-b border-neutral-800 bg-neutral-900/90 backdrop-blur sticky top-0 z-20 shadow-sm">
                 <div class="flex items-center gap-3">
-                    <button id="btn-open-sidebar" class="text-neutral-400 hover:text-white p-1">
-                        <i class="ph ph-list text-2xl"></i>
-                    </button>
+                    <button id="btn-open-sidebar" class="text-neutral-400 hover:text-white p-1"><i class="ph ph-list text-2xl"></i></button>
                     <h2 id="mobile-header-title" class="font-medium text-white truncate">AnyList</h2>
                 </div>
             </header>
 
-            <div class="p-4 md:p-8 max-w-4xl mx-auto w-full flex-1 flex flex-col gap-8 pb-24">
+            <!-- FAB: Floating Action Button fixed to bottom left of the main content area -->
+            <button id="fab-new-list" class="fixed md:absolute bottom-6 left-6 w-14 h-14 bg-white text-black rounded-full flex items-center justify-center shadow-[0_4px_24px_rgba(255,255,255,0.2)] hover:bg-neutral-200 hover:scale-105 active:scale-95 transition-all z-40" title="Criar Nova Lista">
+                <i class="ph ph-plus text-2xl font-bold"></i>
+            </button>
+
+            <div class="p-4 md:p-8 max-w-4xl mx-auto w-full flex-1 flex flex-col gap-8 pb-10">
                 
                 <section id="view-list" class="view-section flex flex-col gap-6 hidden">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 hidden md:flex">
@@ -155,16 +141,11 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button id="btn-edit-list-settings" class="text-neutral-400 hover:text-white text-sm flex items-center gap-1.5 transition-colors bg-neutral-900 px-3 py-1.5 rounded-lg border border-neutral-800 focus:outline-none">
-                                <i class="ph ph-gear"></i> Configurações
-                            </button>
-                            <button id="btn-delete-list" class="text-neutral-500 hover:text-red-400 text-sm flex items-center gap-1.5 transition-colors bg-neutral-900 px-3 py-1.5 rounded-lg border border-neutral-800 focus:outline-none">
-                                <i class="ph ph-trash"></i> Apagar
-                            </button>
+                            <button id="btn-edit-list-settings" class="text-neutral-400 hover:text-white text-sm flex items-center gap-1.5 transition-colors bg-neutral-900 px-3 py-1.5 rounded-lg border border-neutral-800 focus:outline-none"><i class="ph ph-gear"></i> Editar</button>
+                            <button id="btn-delete-list" class="text-neutral-500 hover:text-red-400 text-sm flex items-center gap-1.5 transition-colors bg-neutral-900 px-3 py-1.5 rounded-lg border border-neutral-800 focus:outline-none"><i class="ph ph-trash"></i> Apagar</button>
                         </div>
                     </div>
 
-                    <!-- Mobile metadata row -->
                     <div class="md:hidden flex flex-wrap items-center justify-between gap-3 bg-neutral-900 border border-neutral-800 p-3 rounded-xl border-l-4" id="mobile-list-header-card">
                         <div class="flex items-center gap-2 text-xs text-neutral-400">
                             <i class="ph ph-calendar text-neutral-400"></i>
@@ -172,45 +153,46 @@
                             <span id="mobile-list-type-indicator" class="ml-1 px-1.5 py-0.5 rounded bg-neutral-800 border border-neutral-700"></span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button id="btn-edit-list-settings-mobile" class="text-neutral-400 hover:text-white text-xs bg-neutral-800 px-2.5 py-1.5 rounded-lg border border-neutral-700 flex items-center gap-1">
-                                <i class="ph ph-gear"></i>
-                            </button>
-                            <button id="btn-delete-list-mobile" class="text-neutral-500 hover:text-red-400 text-xs bg-neutral-800 px-2.5 py-1.5 rounded-lg border border-neutral-700 flex items-center gap-1">
-                                <i class="ph ph-trash"></i>
-                            </button>
+                            <button id="btn-edit-list-settings-mobile" class="text-neutral-400 hover:text-white text-xs bg-neutral-800 px-2.5 py-1.5 rounded-lg border border-neutral-700 flex items-center gap-1"><i class="ph ph-gear"></i></button>
+                            <button id="btn-delete-list-mobile" class="text-neutral-500 hover:text-red-400 text-xs bg-neutral-800 px-2.5 py-1.5 rounded-lg border border-neutral-700 flex items-center gap-1"><i class="ph ph-trash"></i></button>
                         </div>
                     </div>
 
+                    <!-- Add Item Form with Image Support -->
                     <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-4 md:p-5 shadow-sm">
                         <form id="form-add-item" class="flex flex-col gap-4">
                             <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-                                <div class="md:col-span-5 flex flex-col gap-1.5 relative">
+                                <div class="md:col-span-6 flex flex-col gap-1.5 relative">
                                     <div class="flex justify-between items-center w-full">
-                                        <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Item</label>
+                                        <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Item & Imagem</label>
                                         <button type="button" id="btn-open-catalog-add" class="text-[10px] text-blue-400 hover:text-blue-300 uppercase font-semibold flex items-center gap-1"><i class="ph ph-book-open"></i> Ver Catálogo</button>
                                     </div>
-                                    <input type="text" id="input-item-name" required placeholder="Ex: Maçã Fuji" autocomplete="off"
-                                        class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-neutral-500 transition-all">
+                                    <div class="flex gap-2">
+                                        <!-- Image Upload Input -->
+                                        <label for="input-item-image" title="Adicionar Imagem" class="cursor-pointer w-10 h-10 flex-shrink-0 bg-neutral-950 border border-neutral-800 rounded-lg flex items-center justify-center hover:bg-neutral-800 transition relative overflow-hidden">
+                                            <i class="ph ph-camera text-neutral-400" id="icon-item-image"></i>
+                                            <img id="preview-item-image" class="absolute inset-0 w-full h-full object-cover hidden">
+                                        </label>
+                                        <input type="file" id="input-item-image" accept="image/*" class="hidden">
+                                        <input type="hidden" id="input-item-image-base64">
+                                        
+                                        <!-- Name Input -->
+                                        <input type="text" id="input-item-name" required placeholder="Ex: Maçã Fuji" autocomplete="off" class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white placeholder-neutral-600 focus:outline-none focus:border-neutral-500 transition-all">
+                                    </div>
                                     <ul id="product-suggestions" class="absolute top-[105%] left-0 right-0 bg-neutral-800 border border-neutral-700 rounded-lg shadow-xl max-h-48 overflow-y-auto hidden z-50 py-1"></ul>
                                 </div>
                                 <div class="md:col-span-3 flex flex-col gap-1.5">
                                     <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Categoria</label>
                                     <select id="input-item-category" required class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-500 transition-all cursor-pointer"></select>
                                 </div>
-                                <div class="grid grid-cols-2 gap-3 md:col-span-4">
+                                <div class="grid grid-cols-2 gap-3 md:col-span-3">
                                     <div class="flex flex-col gap-1.5">
                                         <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Qtd & Un.</label>
                                         <div class="flex gap-1">
-                                            <input type="number" id="input-item-qtd" required min="0.001" step="any" value="1" 
-                                                class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-2 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-500 text-center">
+                                            <input type="number" id="input-item-qtd" required min="0.001" step="any" value="1" class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-2 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-500 text-center">
                                             <select id="input-item-unit" class="bg-neutral-950 border border-neutral-800 rounded-lg px-2 py-2.5 text-xs text-white focus:outline-none focus:border-neutral-500">
-                                                <option value="un">un</option>
-                                                <option value="kg">kg</option>
-                                                <option value="g">g</option>
-                                                <option value="L">L</option>
-                                                <option value="ml">ml</option>
-                                                <option value="pct">pct</option>
-                                                <option value="cx">cx</option>
+                                                <option value="un">un</option><option value="kg">kg</option><option value="g">g</option>
+                                                <option value="L">L</option><option value="ml">ml</option><option value="pct">pct</option><option value="cx">cx</option>
                                             </select>
                                         </div>
                                     </div>
@@ -219,13 +201,10 @@
                             <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
                                 <div class="md:col-span-4 flex flex-col gap-1.5">
                                     <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Valor un. (Opcional)</label>
-                                    <input type="number" id="input-item-price" min="0" step="0.01" placeholder="0.00" 
-                                        class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-500 transition-all placeholder-neutral-700">
+                                    <input type="number" id="input-item-price" min="0" step="0.01" placeholder="0.00" class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-500 transition-all placeholder-neutral-700">
                                 </div>
                                 <div class="md:col-span-8 flex justify-end pt-1">
-                                    <button type="submit" class="w-full md:w-auto bg-white text-black hover:bg-neutral-200 px-6 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center justify-center gap-2">
-                                        <i class="ph ph-plus-bold"></i> Adicionar Item
-                                    </button>
+                                    <button type="submit" class="w-full md:w-auto bg-white text-black hover:bg-neutral-200 px-6 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center justify-center gap-2"><i class="ph ph-plus-bold"></i> Adicionar Item</button>
                                 </div>
                             </div>
                         </form>
@@ -242,25 +221,19 @@
                     </div>
 
                     <div id="empty-list" class="hidden py-16 text-center text-neutral-500 flex-col items-center gap-3">
-                        <div class="w-16 h-16 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center mb-2">
-                            <i class="ph ph-shopping-cart text-3xl opacity-50"></i>
-                        </div>
+                        <div class="w-16 h-16 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center mb-2"><i class="ph ph-shopping-cart text-3xl opacity-50"></i></div>
                         <p class="font-medium">Lista vazia.</p>
                         <p class="text-xs">Adicione itens no formulário acima ou selecione do catálogo.</p>
                     </div>
 
                     <div class="flex flex-col gap-8">
                         <div id="container-pending-items" class="flex flex-col gap-3">
-                            <h3 class="text-xs font-bold text-neutral-500 uppercase tracking-widest border-b border-neutral-800 pb-2 flex justify-between">
-                                Pendentes <span id="count-pending" class="text-neutral-600">0</span>
-                            </h3>
+                            <h3 class="text-xs font-bold text-neutral-500 uppercase tracking-widest border-b border-neutral-800 pb-2 flex justify-between">Pendentes <span id="count-pending" class="text-neutral-600">0</span></h3>
                             <ul id="list-items-pending" class="flex flex-col gap-2.5"></ul>
                         </div>
                         
                         <div id="container-bought-items" class="flex flex-col gap-3 opacity-70 hover:opacity-100 transition-opacity duration-300">
-                            <h3 class="text-xs font-bold text-neutral-500 uppercase tracking-widest border-b border-neutral-800 pb-2 flex justify-between">
-                                Concluídos <span id="count-bought" class="text-neutral-600">0</span>
-                            </h3>
+                            <h3 class="text-xs font-bold text-neutral-500 uppercase tracking-widest border-b border-neutral-800 pb-2 flex justify-between">Concluídos <span id="count-bought" class="text-neutral-600">0</span></h3>
                             <ul id="list-items-bought" class="flex flex-col gap-2.5"></ul>
                         </div>
                     </div>
@@ -270,28 +243,6 @@
                     <div>
                         <h2 class="text-2xl font-bold text-white tracking-tight">Catálogo</h2>
                         <p class="text-sm text-neutral-400 mt-1">Produtos salvos para agilizar suas listas.</p>
-                    </div>
-
-                    <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-5 shadow-sm">
-                        <form id="form-add-product" class="flex flex-col sm:flex-row gap-4 items-end">
-                            <div class="flex-1 flex flex-col gap-1.5 w-full">
-                                <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Nome</label>
-                                <input type="text" id="input-prod-name" required placeholder="Ex: Detergente" 
-                                    class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-500">
-                            </div>
-                            <div class="w-full sm:w-48 flex flex-col gap-1.5">
-                                <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Categoria Padrão</label>
-                                <select id="input-prod-category" required class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-500"></select>
-                            </div>
-                            <div class="w-full sm:w-32 flex flex-col gap-1.5">
-                                <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Preço Base</label>
-                                <input type="number" id="input-prod-price" min="0" step="0.01" placeholder="Opcional" 
-                                    class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-500">
-                            </div>
-                            <button type="submit" class="w-full sm:w-auto bg-neutral-200 text-black hover:bg-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors">
-                                Salvar
-                            </button>
-                        </form>
                     </div>
                     <ul id="list-products" class="grid grid-cols-1 md:grid-cols-2 gap-3"></ul>
                 </section>
@@ -306,8 +257,7 @@
                         <form id="form-add-category" class="flex flex-col sm:flex-row gap-4 items-end">
                             <div class="flex-1 flex flex-col gap-1.5 w-full">
                                 <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Nova Categoria</label>
-                                <input type="text" id="input-cat-name" required placeholder="Ex: Farmácia" autocomplete="off"
-                                    class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-500">
+                                <input type="text" id="input-cat-name" required placeholder="Ex: Farmácia" autocomplete="off" class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-neutral-500">
                             </div>
                             <div class="flex flex-col gap-1.5">
                                 <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Cor</label>
@@ -315,9 +265,7 @@
                                     <input type="color" id="input-cat-color" value="#3b82f6" required>
                                 </div>
                             </div>
-                            <button type="submit" class="w-full sm:w-auto bg-neutral-200 text-black hover:bg-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors h-[42px]">
-                                Adicionar
-                            </button>
+                            <button type="submit" class="w-full sm:w-auto bg-neutral-200 text-black hover:bg-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-colors h-[42px]">Adicionar</button>
                         </form>
                     </div>
                     <ul id="list-categories" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></ul>
@@ -378,17 +326,42 @@
                     </div>
                 </section>
 
-                <section id="view-empty-lists" class="view-section flex flex-col items-center justify-center gap-5 py-24 hidden h-full">
-                    <div class="w-20 h-20 bg-neutral-900 border border-neutral-800 rounded-2xl flex items-center justify-center text-neutral-500 shadow-sm">
-                        <i class="ph ph-stack text-4xl"></i>
+                <section id="view-settings" class="view-section flex flex-col gap-6 hidden">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white tracking-tight">Configurações</h2>
+                        <p class="text-sm text-neutral-400 mt-1">Gerencie seus dados e preferências do aplicativo.</p>
                     </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-sm flex flex-col gap-4">
+                            <div>
+                                <h3 class="text-base font-semibold text-white">Exportar Dados</h3>
+                                <p class="text-xs text-neutral-400 mt-1">Baixe um arquivo contendo todas as suas listas, categorias e itens. Ideal para backup.</p>
+                            </div>
+                            <button id="btn-export-data" class="w-full bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center justify-center gap-2 mt-auto">
+                                <i class="ph ph-download-simple"></i> Baixar Backup JSON
+                            </button>
+                        </div>
+
+                        <div class="bg-neutral-900 border border-neutral-800 rounded-xl p-6 shadow-sm flex flex-col gap-4">
+                            <div>
+                                <h3 class="text-base font-semibold text-white">Importar Dados</h3>
+                                <p class="text-xs text-neutral-400 mt-1">Restaure seus dados a partir de um arquivo JSON. Isso <span class="text-red-400 font-bold">sobrescreverá</span> os dados atuais!</p>
+                            </div>
+                            <input type="file" id="input-import-data" accept=".json" class="hidden">
+                            <button onclick="document.getElementById('input-import-data').click()" class="w-full bg-neutral-800 border border-neutral-700 hover:bg-neutral-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors flex items-center justify-center gap-2 mt-auto">
+                                <i class="ph ph-upload-simple"></i> Selecionar Arquivo JSON
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="view-empty-lists" class="view-section flex flex-col items-center justify-center gap-5 py-24 hidden h-full">
+                    <div class="w-20 h-20 bg-neutral-900 border border-neutral-800 rounded-2xl flex items-center justify-center text-neutral-500 shadow-sm"><i class="ph ph-stack text-4xl"></i></div>
                     <div class="text-center max-w-xs">
                         <h2 class="text-xl font-semibold text-white mb-2">Nenhuma lista ativa</h2>
-                        <p class="text-sm text-neutral-400 leading-relaxed">Selecione uma lista no menu lateral ou crie uma nova para começar.</p>
+                        <p class="text-sm text-neutral-400 leading-relaxed">Clique no botão flutuante '+' no canto inferior esquerdo para criar sua primeira lista.</p>
                     </div>
-                    <button class="btn-trigger-new-list mt-2 bg-white text-black px-6 py-3 rounded-lg text-sm font-semibold hover:bg-neutral-200 transition-colors shadow-lg shadow-white/10">
-                        Criar Nova Lista
-                    </button>
                 </section>
 
             </div>
@@ -416,8 +389,7 @@
                 <div class="flex gap-3">
                     <div class="flex flex-col gap-1.5 flex-1">
                         <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Nome da Lista</label>
-                        <input type="text" id="input-new-list-name" required placeholder="Ex: Mercado..." autocomplete="off"
-                            class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-neutral-500 transition-all">
+                        <input type="text" id="input-new-list-name" required placeholder="Ex: Mercado..." autocomplete="off" class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-neutral-500 transition-all">
                     </div>
                     <div class="flex flex-col gap-1.5">
                         <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Cor</label>
@@ -428,8 +400,7 @@
                 </div>
                 <div class="flex flex-col gap-1.5">
                     <label class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Data da Lista</label>
-                    <input type="date" id="input-new-list-date" required
-                        class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-neutral-500 transition-all cursor-pointer">
+                    <input type="date" id="input-new-list-date" required class="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-neutral-500 transition-all cursor-pointer">
                 </div>
                 <div class="flex items-center gap-3 pt-2 bg-neutral-950/50 p-3 rounded-xl border border-neutral-800/60">
                     <input type="checkbox" id="input-new-list-recurring" class="w-4 h-4 rounded bg-neutral-900 border-neutral-700 text-blue-600 focus:ring-0 cursor-pointer">
@@ -438,9 +409,7 @@
                         <span class="text-[11px] text-neutral-500">Reinicia os checks automaticamente todo mês</span>
                     </div>
                 </div>
-                <button type="submit" id="btn-submit-list-modal" class="w-full bg-white text-black hover:bg-neutral-200 px-4 py-3 rounded-lg text-sm font-semibold transition-colors mt-2">
-                    Criar Lista
-                </button>
+                <button type="submit" id="btn-submit-list-modal" class="w-full bg-white text-black hover:bg-neutral-200 px-4 py-3 rounded-lg text-sm font-semibold transition-colors mt-2">Criar Lista</button>
             </form>
         </div>
     </div>
@@ -460,12 +429,9 @@
                 <input type="hidden" id="input-price-action-type">
                 <div class="relative">
                     <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-500 text-sm">R$</span>
-                    <input type="number" id="input-price-val" required min="0.01" step="0.01" placeholder="0.00" 
-                        class="w-full bg-neutral-950 border border-neutral-800 rounded-lg pl-9 pr-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 transition-all">
+                    <input type="number" id="input-price-val" required min="0.01" step="0.01" placeholder="0.00" class="w-full bg-neutral-950 border border-neutral-800 rounded-lg pl-9 pr-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 transition-all">
                 </div>
-                <button type="submit" class="w-full bg-blue-600 text-white hover:bg-blue-500 px-4 py-3 rounded-lg text-sm font-semibold transition-colors mt-2">
-                    Confirmar
-                </button>
+                <button type="submit" class="w-full bg-blue-600 text-white hover:bg-blue-500 px-4 py-3 rounded-lg text-sm font-semibold transition-colors mt-2">Confirmar</button>
             </form>
         </div>
     </div>
@@ -490,57 +456,40 @@
     </div>
 
     <script>
-        const STORAGE_KEY = 'anylist_local_data_v5';
+        const STORAGE_KEY = 'anylist_local_data_pro';
 
-        // Base defaults based on requested categories
         const DEFAULT_CATEGORIES = [
-            { id: 'cat_1', name: 'Mercado', color: '#10b981' },               // Emerald
-            { id: 'cat_2', name: 'Compras', color: '#eab308' },               // Yellow
-            { id: 'cat_3', name: 'Contas', color: '#ef4444' },                // Red
-            { id: 'cat_4', name: 'Assinaturas', color: '#8b5cf6' },           // Violet
-            { id: 'cat_5', name: 'Salário', color: '#3b82f6' },               // Blue
-            { id: 'cat_6', name: 'Serviços de Informática', color: '#06b6d4' } // Cyan
+            { id: 'cat_1', name: 'Mercado', color: '#10b981' },               
+            { id: 'cat_2', name: 'Compras', color: '#eab308' },               
+            { id: 'cat_3', name: 'Contas', color: '#ef4444' },                
+            { id: 'cat_4', name: 'Assinaturas', color: '#8b5cf6' }
         ];
 
         let appData = {
             categories: [...DEFAULT_CATEGORIES],
-            lists: [],
-            items: [],
-            products: [],
-            activeListId: null
+            lists: [], items: [], products: [], activeListId: null
         };
 
         const getTodayDateStr = () => new Date().toISOString().slice(0, 10);
         
         let state = { 
             activeView: 'empty-lists',
-            statsDateStart: getTodayDateStr().slice(0, 8) + '01', // First day of current month
+            statsDateStart: getTodayDateStr().slice(0, 8) + '01', 
             statsDateEnd: getTodayDateStr(),
-            listSearchQuery: '',
-            listSortOrder: 'desc'
+            listSearchQuery: '', listSortOrder: 'desc', listMonthFilter: ''
         };
 
-        // --- PWA SETUP VIA BLOB ---
         (function setupPWA() {
             const manifest = {
-                "name": "AnyList Pro",
-                "short_name": "AnyList",
-                "start_url": ".",
-                "display": "standalone",
-                "background_color": "#0a0a0a",
-                "theme_color": "#0a0a0a",
+                "name": "AnyList Pro", "short_name": "AnyList", "start_url": ".", "display": "standalone",
+                "background_color": "#0a0a0a", "theme_color": "#0a0a0a",
                 "icons": [{
                     "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2Ij48cmVjdCB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgZmlsbD0ibm9uZSIvPjxwb2x5bGluZSBwb2ludHM9IjQwIDE0NCA5NiAyMDAgMjI0IDcyIiBmaWxsPSJub25lIiBzdHJva2U9IiMzYjgyZjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLXdpZHRoPSIyNCIvPjwvc3ZnPg==",
-                    "sizes": "192x192",
-                    "type": "image/svg+xml"
+                    "sizes": "192x192", "type": "image/svg+xml"
                 }]
             };
             const manifestBlob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
-            const manifestUrl = URL.createObjectURL(manifestBlob);
-            const link = document.createElement('link');
-            link.rel = 'manifest';
-            link.href = manifestUrl;
-            document.head.appendChild(link);
+            const link = document.createElement('link'); link.rel = 'manifest'; link.href = URL.createObjectURL(manifestBlob); document.head.appendChild(link);
 
             const swCode = `
                 self.addEventListener('install', e => self.skipWaiting());
@@ -552,115 +501,57 @@
                 });
             `;
             const swBlob = new Blob([swCode], {type: 'application/javascript'});
-            const swUrl = URL.createObjectURL(swBlob);
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register(swUrl).catch(err => console.log('SW registration failed:', err));
+                navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(err => console.log('SW registration failed:', err));
             }
-
-            let deferredPrompt;
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                const btn = document.getElementById('btn-install-app');
-                if(btn) {
-                    btn.classList.remove('hidden');
-                    btn.addEventListener('click', async () => {
-                        deferredPrompt.prompt();
-                        const { outcome } = await deferredPrompt.userChoice;
-                        if (outcome === 'accepted') {
-                            btn.classList.add('hidden');
-                        }
-                        deferredPrompt = null;
-                    });
-                }
-            });
         })();
 
         const DOM = {
             sidebar: {
-                self: document.getElementById('sidebar'),
-                overlay: document.getElementById('mobile-overlay'),
-                openBtn: document.getElementById('btn-open-sidebar'),
-                closeBtn: document.getElementById('btn-close-sidebar'),
-                listsContainer: document.getElementById('sidebar-lists'),
-                navBtns: document.querySelectorAll('.nav-btn'),
-                newBtn: document.getElementById('btn-show-new-list'),
-                searchInput: document.getElementById('input-search-lists'),
-                sortSelect: document.getElementById('select-sort-lists')
+                self: document.getElementById('sidebar'), overlay: document.getElementById('mobile-overlay'),
+                openBtn: document.getElementById('btn-open-sidebar'), closeBtn: document.getElementById('btn-close-sidebar'),
+                listsContainer: document.getElementById('sidebar-lists'), navBtns: document.querySelectorAll('.nav-btn'),
+                searchInput: document.getElementById('sidebar-search'),
+                sortSelect: document.getElementById('sidebar-sort'), monthFilter: document.getElementById('sidebar-month-filter')
             },
             views: {
-                list: document.getElementById('view-list'),
-                products: document.getElementById('view-products'),
-                categories: document.getElementById('view-categories'),
-                stats: document.getElementById('view-stats'),
-                empty: document.getElementById('view-empty-lists')
+                list: document.getElementById('view-list'), products: document.getElementById('view-products'),
+                categories: document.getElementById('view-categories'), stats: document.getElementById('view-stats'),
+                settings: document.getElementById('view-settings'), empty: document.getElementById('view-empty-lists')
             },
-            modals: {
-                newList: document.getElementById('modal-new-list'),
-                addPrice: document.getElementById('modal-add-price'),
-                selectCatalog: document.getElementById('modal-select-catalog')
-            },
-            forms: {
-                addItem: document.getElementById('form-add-item'),
-                addProduct: document.getElementById('form-add-product'),
-                newList: document.getElementById('form-new-list'),
-                addCategory: document.getElementById('form-add-category'),
-                addPrice: document.getElementById('form-add-price')
-            },
+            modals: { newList: document.getElementById('modal-new-list'), addPrice: document.getElementById('modal-add-price'), selectCatalog: document.getElementById('modal-select-catalog') },
+            forms: { addItem: document.getElementById('form-add-item'), newList: document.getElementById('form-new-list'), addCategory: document.getElementById('form-add-category'), addPrice: document.getElementById('form-add-price') },
             listApp: {
-                title: document.getElementById('current-list-title'),
-                typeBadge: document.getElementById('current-list-type-badge'),
-                mobileTitle: document.getElementById('mobile-header-title'),
-                mobileCard: document.getElementById('mobile-list-header-card'),
-                mobileTypeIndicator: document.getElementById('mobile-list-type-indicator'),
-                recurrenceBadge: document.getElementById('current-list-recurrence-badge'),
-                inputDate: document.getElementById('input-list-date'),
-                inputDateMobile: document.getElementById('input-list-date-mobile'),
-                editSettingsBtn: document.getElementById('btn-edit-list-settings'),
-                editSettingsBtnMobile: document.getElementById('btn-edit-list-settings-mobile'),
-                pendingList: document.getElementById('list-items-pending'),
-                boughtList: document.getElementById('list-items-bought'),
-                emptyState: document.getElementById('empty-list'),
-                pendingContainer: document.getElementById('container-pending-items'),
-                boughtContainer: document.getElementById('container-bought-items'),
-                progressText: document.getElementById('list-progress-text'),
-                progressTotal: document.getElementById('list-total-text'),
-                progressBar: document.getElementById('list-progress-bar'),
-                deleteBtn: document.getElementById('btn-delete-list'),
-                deleteBtnMobile: document.getElementById('btn-delete-list-mobile'),
-                inputName: document.getElementById('input-item-name'),
-                inputCat: document.getElementById('input-item-category'),
-                inputQtd: document.getElementById('input-item-qtd'),
-                inputUnit: document.getElementById('input-item-unit'),
-                inputPrice: document.getElementById('input-item-price'),
-                suggestions: document.getElementById('product-suggestions'),
-                countPending: document.getElementById('count-pending'),
-                countBought: document.getElementById('count-bought'),
-                btnOpenCatalog: document.getElementById('btn-open-catalog-add'),
-                catalogSelectionList: document.getElementById('list-catalog-selection')
+                title: document.getElementById('current-list-title'), typeBadge: document.getElementById('current-list-type-badge'), mobileTitle: document.getElementById('mobile-header-title'),
+                mobileCard: document.getElementById('mobile-list-header-card'), mobileTypeIndicator: document.getElementById('mobile-list-type-indicator'),
+                recurrenceBadge: document.getElementById('current-list-recurrence-badge'), inputDate: document.getElementById('input-list-date'),
+                inputDateMobile: document.getElementById('input-list-date-mobile'), editSettingsBtn: document.getElementById('btn-edit-list-settings'),
+                editSettingsBtnMobile: document.getElementById('btn-edit-list-settings-mobile'), pendingList: document.getElementById('list-items-pending'),
+                boughtList: document.getElementById('list-items-bought'), emptyState: document.getElementById('empty-list'),
+                pendingContainer: document.getElementById('container-pending-items'), boughtContainer: document.getElementById('container-bought-items'),
+                progressText: document.getElementById('list-progress-text'), progressTotal: document.getElementById('list-total-text'),
+                progressBar: document.getElementById('list-progress-bar'), deleteBtn: document.getElementById('btn-delete-list'), deleteBtnMobile: document.getElementById('btn-delete-list-mobile'),
+                inputName: document.getElementById('input-item-name'), inputCat: document.getElementById('input-item-category'),
+                inputQtd: document.getElementById('input-item-qtd'), inputUnit: document.getElementById('input-item-unit'),
+                inputPrice: document.getElementById('input-item-price'), suggestions: document.getElementById('product-suggestions'),
+                inputImage: document.getElementById('input-item-image'), previewImage: document.getElementById('preview-item-image'),
+                iconImage: document.getElementById('icon-item-image'), inputImageBase64: document.getElementById('input-item-image-base64'),
+                countPending: document.getElementById('count-pending'), countBought: document.getElementById('count-bought'),
+                btnOpenCatalog: document.getElementById('btn-open-catalog-add'), catalogSelectionList: document.getElementById('list-catalog-selection')
             },
-            productsApp: {
-                list: document.getElementById('list-products'),
-                inputName: document.getElementById('input-prod-name'),
-                inputCat: document.getElementById('input-prod-category'),
-                inputPrice: document.getElementById('input-prod-price')
-            },
-            categoriesApp: {
-                list: document.getElementById('list-categories'),
-                inputName: document.getElementById('input-cat-name'),
-                inputColor: document.getElementById('input-cat-color')
-            },
+            productsApp: { list: document.getElementById('list-products') },
+            categoriesApp: { list: document.getElementById('list-categories'), inputName: document.getElementById('input-cat-name'), inputColor: document.getElementById('input-cat-color') },
             statsApp: {
-                totalIncome: document.getElementById('stat-total-income'),
-                totalExpense: document.getElementById('stat-total-expense'),
-                balance: document.getElementById('stat-balance'),
-                incomeCategoriesList: document.getElementById('stats-income-categories'),
-                categoriesList: document.getElementById('stats-categories'),
-                unpaidItemsList: document.getElementById('stats-unpaid-items'),
-                dateStart: document.getElementById('stats-date-start'),
-                dateEnd: document.getElementById('stats-date-end'),
-                btnApply: document.getElementById('btn-apply-stats-filter')
-            }
+                totalIncome: document.getElementById('stat-total-income'), totalExpense: document.getElementById('stat-total-expense'), balance: document.getElementById('stat-balance'),
+                incomeCategoriesList: document.getElementById('stats-income-categories'), categoriesList: document.getElementById('stats-categories'),
+                unpaidItemsList: document.getElementById('stats-unpaid-items'), dateStart: document.getElementById('stats-date-start'),
+                dateEnd: document.getElementById('stats-date-end'), btnApply: document.getElementById('btn-apply-stats-filter')
+            },
+            settingsApp: {
+                btnExport: document.getElementById('btn-export-data'),
+                inputImport: document.getElementById('input-import-data')
+            },
+            fabNewList: document.getElementById('fab-new-list')
         };
 
         function loadData() {
@@ -668,111 +559,82 @@
             if (stored) {
                 try {
                     const parsed = JSON.parse(stored);
-                    
-                    // Basic Migration: Convert old string categories and add list types
-                    if (parsed.categories && parsed.categories.length > 0 && typeof parsed.categories[0] === 'string') {
-                        parsed.categories = parsed.categories.map((c, i) => {
-                            const defaults = DEFAULT_CATEGORIES.find(d => d.name.toLowerCase() === c.toLowerCase());
-                            return { 
-                                id: 'cat_' + Date.now() + i, 
-                                name: c, 
-                                color: defaults ? defaults.color : '#525252' 
-                            };
-                        });
-                        parsed.categories = parsed.categories.filter(c => c.name.toLowerCase() !== 'benfica');
-                    }
-                    
-                    if (parsed.lists) {
-                        parsed.lists.forEach(list => {
-                            if (!list.type) list.type = 'despesa'; // Migration fallback for older versions
-                        });
-                    }
-
                     appData = { ...appData, ...parsed };
-                } catch (e) {
-                    console.error("Error parsing local storage", e);
-                }
+                } catch (e) { console.error("Error parsing local storage", e); }
             }
-            
             checkRecurringLists();
-            
             DOM.statsApp.dateStart.value = state.statsDateStart;
             DOM.statsApp.dateEnd.value = state.statsDateEnd;
-
             syncUI();
         }
 
         function checkRecurringLists() {
             const currentMonthStr = new Date().toISOString().slice(0, 7);
             let updated = false;
-
             appData.lists.forEach(list => {
-                if (list.isRecurring) {
-                    if (!list.lastResetMonth || list.lastResetMonth < currentMonthStr) {
-                        appData.items.forEach(item => {
-                            if (item.listId === list.id) {
-                                item.isBought = false;
-                                item.boughtAt = null;
-                            }
-                        });
-                        list.lastResetMonth = currentMonthStr;
-                        updated = true;
-                    }
+                if (list.isRecurring && (!list.lastResetMonth || list.lastResetMonth < currentMonthStr)) {
+                    appData.items.forEach(item => {
+                        if (item.listId === list.id) { item.isBought = false; item.boughtAt = null; }
+                    });
+                    list.lastResetMonth = currentMonthStr;
+                    updated = true;
                 }
             });
             if (updated) saveDataToStorage();
         }
 
-        function saveDataToStorage() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
-        }
-
-        function saveData() {
-            saveDataToStorage();
-            syncUI();
-        }
-
-        function generateId() {
-            return Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
-        }
-
-        function getCategoryDetails(catIdOrName) {
-            let cat = appData.categories.find(c => c.id === catIdOrName || c.name === catIdOrName);
-            return cat || { name: catIdOrName || 'Desconhecida', color: '#525252' };
-        }
-
+        function saveDataToStorage() { localStorage.setItem(STORAGE_KEY, JSON.stringify(appData)); }
+        function saveData() { saveDataToStorage(); syncUI(); }
+        function generateId() { return Math.random().toString(36).substr(2, 9) + Date.now().toString(36); }
+        function getCategoryDetails(id) { return appData.categories.find(c => c.id === id || c.name === id) || { name: id || '?', color: '#525252' }; }
         function hexToRgba(hex, alpha = 1) {
             let r=0, g=0, b=0;
             if(hex.length == 4) { r=parseInt(hex[1]+hex[1],16); g=parseInt(hex[2]+hex[2],16); b=parseInt(hex[3]+hex[3],16); }
             else if(hex.length == 7) { r=parseInt(hex.slice(1,3),16); g=parseInt(hex.slice(3,5),16); b=parseInt(hex.slice(5,7),16); }
             return `rgba(${r}, ${g}, ${b}, ${alpha})`;
         }
-
         function createCatBadgeHTML(cat) {
-            const bg = hexToRgba(cat.color, 0.15);
-            const border = hexToRgba(cat.color, 0.3);
+            const bg = hexToRgba(cat.color, 0.15), border = hexToRgba(cat.color, 0.3);
             return `<span class="uppercase tracking-wider font-bold text-[10px] px-1.5 py-0.5 rounded border" style="background-color: ${bg}; border-color: ${border}; color: ${cat.color}">${escapeHtml(cat.name)}</span>`;
         }
-        
         const fmtCurrency = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
+        function escapeHtml(unsafe) { return (typeof unsafe !== 'string') ? unsafe : unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;"); }
+
+        function resizeImage(file, maxWidth = 100, maxHeight = 100) {
+            return new Promise((resolve, reject) => {
+                if (!file) return resolve(null);
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = event => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > height) { if (width > maxWidth) { height *= maxWidth / width; width = maxWidth; } } 
+                        else { if (height > maxHeight) { width *= maxHeight / height; height = maxHeight; } }
+                        canvas.width = width; canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.7)); // compress
+                    };
+                    img.onerror = error => reject(error);
+                };
+                reader.onerror = error => reject(error);
+            });
+        }
 
         function syncUI() {
             updateCategorySelects();
             renderSidebar();
             
-            if (appData.activeListId && !appData.lists.find(l => l.id === appData.activeListId)) {
-                appData.activeListId = null;
-            }
-            
+            if (appData.activeListId && !appData.lists.find(l => l.id === appData.activeListId)) appData.activeListId = null;
             if (appData.activeListId) {
                 if (state.activeView === 'empty-lists') switchView('list');
             } else {
-                if (appData.lists.length > 0) {
-                    appData.activeListId = appData.lists[0].id;
-                    switchView('list');
-                } else {
-                    switchView('empty-lists');
-                }
+                if (appData.lists.length > 0) { appData.activeListId = appData.lists[0].id; switchView('list'); }
+                else switchView('empty-lists');
             }
 
             if (state.activeView === 'list') renderActiveList();
@@ -787,97 +649,56 @@
             DOM.sidebar.navBtns.forEach(btn => btn.classList.remove('bg-neutral-800', 'text-white'));
             document.querySelectorAll('.sidebar-list-item').forEach(el => el.classList.remove('bg-neutral-800', 'text-white'));
 
+            if(DOM.views[viewName]) { DOM.views[viewName].classList.remove('hidden'); DOM.views[viewName].classList.add('flex'); }
+
             if(viewName === 'list') {
-                DOM.views.list.classList.remove('hidden'); DOM.views.list.classList.add('flex');
                 const listEl = document.getElementById(`nav-list-${appData.activeListId}`);
                 if(listEl) listEl.classList.add('bg-neutral-800', 'text-white');
                 const activeList = appData.lists.find(l => l.id === appData.activeListId);
                 if(activeList) {
-                    DOM.listApp.title.textContent = activeList.name;
-                    DOM.listApp.mobileTitle.textContent = activeList.name;
-                    DOM.listApp.inputDate.value = activeList.date || getTodayDateStr();
-                    DOM.listApp.inputDateMobile.value = activeList.date || getTodayDateStr();
+                    DOM.listApp.title.textContent = activeList.name; DOM.listApp.mobileTitle.textContent = activeList.name;
+                    DOM.listApp.inputDate.value = activeList.date || getTodayDateStr(); DOM.listApp.inputDateMobile.value = activeList.date || getTodayDateStr();
                     DOM.listApp.recurrenceBadge.classList.toggle('hidden', !activeList.isRecurring);
-                    
                     const listTypeColor = activeList.type === 'entrada' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20' : 'text-neutral-300 bg-neutral-800 border-neutral-700';
                     DOM.listApp.typeBadge.className = `px-2 py-0.5 rounded font-medium border ${listTypeColor}`;
                     DOM.listApp.typeBadge.textContent = activeList.type === 'entrada' ? 'Entrada' : 'Despesa';
-                    
                     DOM.listApp.mobileTypeIndicator.className = `ml-1 px-1.5 py-0.5 rounded border text-[10px] font-bold uppercase ${listTypeColor}`;
                     DOM.listApp.mobileTypeIndicator.textContent = activeList.type === 'entrada' ? 'Entrada' : 'Despesa';
-                    
                     const listColor = activeList.color || '#3b82f6';
-                    DOM.listApp.title.style.borderColor = listColor;
-                    DOM.listApp.mobileCard.style.borderColor = listColor;
-                    DOM.listApp.progressBar.style.backgroundColor = listColor;
-                    DOM.listApp.progressBar.style.boxShadow = `0 0 10px ${hexToRgba(listColor, 0.5)}`;
+                    DOM.listApp.title.style.borderColor = listColor; DOM.listApp.mobileCard.style.borderColor = listColor;
+                    DOM.listApp.progressBar.style.backgroundColor = listColor; DOM.listApp.progressBar.style.boxShadow = `0 0 10px ${hexToRgba(listColor, 0.5)}`;
                 }
                 renderActiveList();
-            } else if (viewName === 'products') {
-                DOM.views.products.classList.remove('hidden'); DOM.views.products.classList.add('flex');
-                document.querySelector('[data-target="products"]').classList.add('bg-neutral-800', 'text-white');
-                DOM.listApp.mobileTitle.textContent = "Catálogo";
-                renderProducts();
-            } else if (viewName === 'categories') {
-                DOM.views.categories.classList.remove('hidden'); DOM.views.categories.classList.add('flex');
-                document.querySelector('[data-target="categories"]').classList.add('bg-neutral-800', 'text-white');
-                DOM.listApp.mobileTitle.textContent = "Categorias";
-                renderCategories();
-            } else if (viewName === 'stats') {
-                DOM.views.stats.classList.remove('hidden'); DOM.views.stats.classList.add('flex');
-                document.querySelector('[data-target="stats"]').classList.add('bg-neutral-800', 'text-white');
-                DOM.listApp.mobileTitle.textContent = "Estatísticas";
-                renderStats();
-            } else {
-                DOM.views.empty.classList.remove('hidden'); DOM.views.empty.classList.add('flex');
-                DOM.listApp.mobileTitle.textContent = "AnyList";
-            }
+            } else if (viewName !== 'empty-lists') {
+                const navBtn = document.querySelector(`[data-target="${viewName}"]`);
+                if(navBtn) navBtn.classList.add('bg-neutral-800', 'text-white');
+                DOM.listApp.mobileTitle.textContent = viewName === 'products' ? "Catálogo" : viewName === 'categories' ? "Categorias" : viewName === 'stats' ? "Estatísticas" : "Configurações";
+                if(viewName === 'products') renderProducts(); if(viewName === 'categories') renderCategories(); if(viewName === 'stats') renderStats();
+            } else { DOM.listApp.mobileTitle.textContent = "AnyList"; }
             if(window.closeSidebarOnMobile) window.closeSidebarOnMobile();
-        }
-
-        function selectList(listId) {
-            appData.activeListId = listId;
-            saveData();
         }
 
         function renderSidebar() {
             DOM.sidebar.listsContainer.innerHTML = '';
-            
             let filteredLists = appData.lists.filter(l => l.name.toLowerCase().includes(state.listSearchQuery.toLowerCase()));
+            if (state.listMonthFilter) filteredLists = filteredLists.filter(l => l.date && l.date.startsWith(state.listMonthFilter));
             
-            if (filteredLists.length === 0) {
-                DOM.sidebar.listsContainer.innerHTML = '<div class="px-3 py-4 text-xs text-neutral-600 text-center italic">Nenhuma lista encontrada.</div>';
-                return;
-            }
-            
+            if (filteredLists.length === 0) { DOM.sidebar.listsContainer.innerHTML = '<div class="px-3 py-4 text-xs text-neutral-600 text-center italic">Nenhuma lista.</div>'; return; }
             filteredLists.sort((a, b) => {
                 if (state.listSortOrder === 'desc') return (b.date || '').localeCompare(a.date || '');
                 if (state.listSortOrder === 'asc') return (a.date || '').localeCompare(b.date || '');
-                if (state.listSortOrder === 'az') return a.name.localeCompare(b.name);
-                return 0;
+                if (state.listSortOrder === 'az') return a.name.localeCompare(b.name); return 0;
             });
-
             filteredLists.forEach(list => {
-                const btn = document.createElement('button');
-                btn.id = `nav-list-${list.id}`;
+                const btn = document.createElement('button'); btn.id = `nav-list-${list.id}`;
                 const isActive = appData.activeListId === list.id && state.activeView === 'list';
                 btn.className = `sidebar-list-item w-full text-left px-3 py-2.5 rounded-lg flex items-center justify-between text-neutral-400 hover:bg-neutral-800 hover:text-white transition-colors truncate font-medium border-l-[3px] ${isActive ? 'bg-neutral-800 text-white' : 'border-transparent'}`;
-                
-                const listColor = list.color || '#3b82f6';
-                if(isActive) btn.style.borderColor = listColor;
-                
+                const listColor = list.color || '#3b82f6'; if(isActive) btn.style.borderColor = listColor;
                 const typeIcon = list.type === 'entrada' ? '<i class="ph ph-arrow-down-left text-emerald-400"></i>' : '';
-
-                btn.innerHTML = `
-                    <div class="flex items-center gap-3 truncate">
-                        <div class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-sm" style="background-color: ${listColor}"></div>
-                        <span class="truncate flex items-center gap-1">${escapeHtml(list.name)} ${typeIcon}</span>
-                    </div>
-                    ${list.isRecurring ? '<i class="ph ph-arrows-clockwise text-xs text-blue-400 flex-shrink-0" title="Recorrente Mensal"></i>' : ''}
-                `;
+                btn.innerHTML = `<div class="flex items-center gap-3 truncate"><div class="w-2.5 h-2.5 rounded-full flex-shrink-0 shadow-sm" style="background-color: ${listColor}"></div><span class="truncate flex items-center gap-1">${escapeHtml(list.name)} ${typeIcon}</span></div>${list.isRecurring ? '<i class="ph ph-arrows-clockwise text-xs text-blue-400 flex-shrink-0"></i>' : ''}`;
                 btn.onmouseenter = () => { if(!isActive) btn.style.borderColor = listColor; };
                 btn.onmouseleave = () => { if(!isActive) btn.style.borderColor = 'transparent'; };
-                btn.onclick = () => { selectList(list.id); switchView('list'); };
+                btn.onclick = () => { appData.activeListId = list.id; saveData(); switchView('list'); };
                 DOM.sidebar.listsContainer.appendChild(btn);
             });
         }
@@ -885,32 +706,19 @@
         function renderActiveList() {
             if(!appData.activeListId) return;
             const listItems = appData.items.filter(i => i.listId === appData.activeListId);
-            
-            DOM.listApp.pendingList.innerHTML = '';
-            DOM.listApp.boughtList.innerHTML = '';
-            
-            let totalExpected = 0; let totalBought = 0;
-            const pending = []; const bought = [];
-
+            DOM.listApp.pendingList.innerHTML = ''; DOM.listApp.boughtList.innerHTML = '';
+            let totalExpected = 0; let totalBought = 0; const pending = []; const bought = [];
             listItems.forEach(item => {
-                const itemTotal = item.qtd * (item.price || 0);
-                totalExpected += itemTotal;
-                if(item.isBought) { totalBought += itemTotal; bought.push(item); } 
-                else { pending.push(item); }
+                const itemTotal = item.qtd * (item.price || 0); totalExpected += itemTotal;
+                if(item.isBought) { totalBought += itemTotal; bought.push(item); } else pending.push(item);
             });
-
             DOM.listApp.progressText.textContent = `${bought.length} de ${listItems.length} itens`;
             DOM.listApp.progressTotal.innerHTML = `Total: <span class="font-bold text-white">${fmtCurrency(totalBought)}</span> <span class="text-neutral-500 font-normal">/ ${fmtCurrency(totalExpected)}</span>`;
-            const pct = listItems.length > 0 ? (bought.length / listItems.length) * 100 : 0;
-            DOM.listApp.progressBar.style.width = `${pct}%`;
-
-            DOM.listApp.countPending.textContent = pending.length;
-            DOM.listApp.countBought.textContent = bought.length;
-
+            DOM.listApp.progressBar.style.width = `${listItems.length > 0 ? (bought.length / listItems.length) * 100 : 0}%`;
+            DOM.listApp.countPending.textContent = pending.length; DOM.listApp.countBought.textContent = bought.length;
             DOM.listApp.emptyState.classList.toggle('hidden', listItems.length > 0);
             DOM.listApp.pendingContainer.classList.toggle('hidden', pending.length === 0);
             DOM.listApp.boughtContainer.classList.toggle('hidden', bought.length === 0);
-
             pending.sort((a,b) => b.createdAt - a.createdAt).forEach(item => renderItemRow(item, DOM.listApp.pendingList));
             bought.sort((a,b) => b.createdAt - a.createdAt).forEach(item => renderItemRow(item, DOM.listApp.boughtList));
         }
@@ -918,38 +726,27 @@
         function renderItemRow(item, container) {
             const li = document.createElement('li');
             li.className = `group flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-xl border border-neutral-800 bg-neutral-900/80 shadow-sm transition-all ${item.isBought ? 'grayscale-[30%]' : 'hover:border-neutral-700'}`;
-            
             const itemTotal = item.price ? (item.qtd * item.price) : 0;
-            let priceHtml = '';
+            const priceHtml = item.price ? `<span class="text-sm font-semibold text-white ${item.isBought ? 'line-through-custom' : ''}">${fmtCurrency(itemTotal)}</span>` : `<button onclick="window.openPriceModal('${item.id}', '${escapeHtml(item.name).replace(/'/g, "\\'")}', false)" class="text-xs font-semibold tracking-wide text-neutral-400 bg-neutral-800 hover:text-white px-3 py-1.5 rounded-lg transition-colors border border-neutral-700 whitespace-nowrap">+ Valor</button>`;
             const cat = getCategoryDetails(item.categoryId || item.category);
-
-            if (item.price) {
-                priceHtml = `<span class="text-sm font-semibold text-white ${item.isBought ? 'line-through-custom' : ''}">${fmtCurrency(itemTotal)}</span>`;
-            } else {
-                priceHtml = `<button onclick="window.openPriceModal('${item.id}', '${escapeHtml(item.name).replace(/'/g, "\\'")}', false)" class="text-xs font-semibold tracking-wide text-neutral-400 bg-neutral-800 hover:text-white px-3 py-1.5 rounded-lg transition-colors border border-neutral-700 whitespace-nowrap">+ Valor</button>`;
-            }
-
-            const unitLabel = item.unit || 'un';
+            
+            // Image logic
+            const imgHtml = item.image ? `<img src="${item.image}" class="w-10 h-10 object-cover rounded border border-neutral-700 flex-shrink-0" alt="img">` : '';
 
             li.innerHTML = `
-                <div class="flex items-center gap-4 flex-1 overflow-hidden">
-                    <button onclick="window.toggleItemStatus('${item.id}')" class="flex-shrink-0 w-7 h-7 rounded-lg border flex items-center justify-center transition-colors ${item.isBought ? 'bg-blue-600 border-blue-600 text-white shadow-[0_0_12px_rgba(37,99,235,0.4)]' : 'border-neutral-600 text-transparent hover:border-blue-500'}">
-                        <i class="ph ph-check-bold text-sm"></i>
-                    </button>
+                <div class="flex items-center gap-3 md:gap-4 flex-1 overflow-hidden">
+                    <button onclick="window.toggleItemStatus('${item.id}')" class="flex-shrink-0 w-7 h-7 rounded-lg border flex items-center justify-center transition-colors ${item.isBought ? 'bg-blue-600 border-blue-600 text-white shadow-[0_0_12px_rgba(37,99,235,0.4)]' : 'border-neutral-600 text-transparent hover:border-blue-500'}"><i class="ph ph-check-bold text-sm"></i></button>
+                    ${imgHtml}
                     <div class="flex flex-col truncate">
                         <span class="font-medium text-white truncate text-[15px] ${item.isBought ? 'line-through-custom' : ''}">${escapeHtml(item.name)}</span>
                         <div class="flex items-center gap-2 mt-1 text-xs text-neutral-500">
-                            ${createCatBadgeHTML(cat)}
-                            <span>&bull;</span>
-                            <span>${item.qtd} ${unitLabel} ${item.price ? `(${fmtCurrency(item.price)}/${unitLabel})` : ''}</span>
+                            ${createCatBadgeHTML(cat)}<span>&bull;</span><span>${item.qtd} ${item.unit || 'un'} ${item.price ? `(${fmtCurrency(item.price)}/${item.unit || 'un'})` : ''}</span>
                         </div>
                     </div>
                 </div>
-                <div class="flex items-center justify-between sm:justify-end gap-4 mt-4 sm:mt-0 ml-11 sm:ml-0">
+                <div class="flex items-center justify-between sm:justify-end gap-4 mt-4 sm:mt-0 ml-10 md:ml-0">
                     ${priceHtml}
-                    <button onclick="window.deleteItem('${item.id}')" class="text-neutral-500 hover:text-red-400 p-2 rounded-lg hover:bg-neutral-800 transition-colors sm:opacity-0 group-hover:opacity-100 focus:opacity-100 flex-shrink-0">
-                        <i class="ph ph-trash text-lg"></i>
-                    </button>
+                    <button onclick="window.deleteItem('${item.id}')" class="text-neutral-500 hover:text-red-400 p-2 rounded-lg hover:bg-neutral-800 transition-colors sm:opacity-0 group-hover:opacity-100 focus:opacity-100 flex-shrink-0"><i class="ph ph-trash text-lg"></i></button>
                 </div>
             `;
             container.appendChild(li);
@@ -958,237 +755,110 @@
         window.toggleItemStatus = (itemId) => {
             const item = appData.items.find(i => i.id === itemId);
             if (!item) return;
-
-            if (!item.isBought && (!item.price || item.price <= 0)) {
-                window.openPriceModal(item.id, item.name, true);
-                return;
-            }
-
-            item.isBought = !item.isBought;
-            item.boughtAt = item.isBought ? Date.now() : null;
-            saveData();
+            if (!item.isBought && (!item.price || item.price <= 0)) { window.openPriceModal(item.id, item.name, true); return; }
+            item.isBought = !item.isBought; item.boughtAt = item.isBought ? Date.now() : null; saveData();
         };
 
-        window.deleteItem = (itemId) => {
-            appData.items = appData.items.filter(i => i.id !== itemId);
-            saveData();
-            showToast("Item removido");
-        };
-
+        window.deleteItem = (itemId) => { appData.items = appData.items.filter(i => i.id !== itemId); saveData(); showToast("Item removido"); };
+        
         window.openPriceModal = (itemId, itemName, markAsBoughtAfter = false) => {
-            document.getElementById('input-price-item-id').value = itemId;
-            document.getElementById('input-price-action-type').value = markAsBoughtAfter ? 'check' : 'update';
-            document.getElementById('modal-price-item-name').textContent = itemName;
-            document.getElementById('input-price-val').value = '';
-            
-            const btnText = markAsBoughtAfter ? 'Confirmar' : 'Salvar Valor';
-            DOM.forms.addPrice.querySelector('button').textContent = btnText;
-
+            document.getElementById('input-price-item-id').value = itemId; document.getElementById('input-price-action-type').value = markAsBoughtAfter ? 'check' : 'update';
+            document.getElementById('modal-price-item-name').textContent = itemName; document.getElementById('input-price-val').value = '';
+            DOM.forms.addPrice.querySelector('button').textContent = markAsBoughtAfter ? 'Confirmar' : 'Salvar Valor';
             DOM.modals.addPrice.classList.remove('hidden'); DOM.modals.addPrice.classList.add('flex');
             setTimeout(() => document.getElementById('input-price-val').focus(), 50);
         };
 
         window.goToUnpaidItem = (listId, itemId, itemName) => {
-            selectList(listId);
-            switchView('list');
-            setTimeout(() => {
-                window.openPriceModal(itemId, itemName, true);
-            }, 150);
+            appData.activeListId = listId; saveData(); switchView('list');
+            setTimeout(() => { window.openPriceModal(itemId, itemName, true); }, 150);
         };
 
         function renderProducts() {
             DOM.productsApp.list.innerHTML = '';
-            if(appData.products.length === 0) {
-                DOM.productsApp.list.innerHTML = '<div class="col-span-full text-neutral-500 text-sm text-center py-12 bg-neutral-900 rounded-xl border border-neutral-800 border-dashed">Nenhum produto salvo no catálogo.</div>';
-                return;
-            }
-            const sorted = [...appData.products].sort((a,b) => a.name.localeCompare(b.name));
-
-            sorted.forEach(p => {
+            if(appData.products.length === 0) { DOM.productsApp.list.innerHTML = '<div class="col-span-full text-neutral-500 text-sm text-center py-12 bg-neutral-900 rounded-xl border border-neutral-800 border-dashed">Nenhum produto salvo no catálogo.</div>'; return; }
+            [...appData.products].sort((a,b) => a.name.localeCompare(b.name)).forEach(p => {
                 const cat = getCategoryDetails(p.defaultCategoryId || p.defaultCategory);
-                const li = document.createElement('li');
-                li.className = "flex justify-between items-center p-4 rounded-xl border border-neutral-800 bg-neutral-900 shadow-sm";
+                const li = document.createElement('li'); li.className = "flex justify-between items-center p-4 rounded-xl border border-neutral-800 bg-neutral-900 shadow-sm gap-3";
+                const imgHtml = p.image ? `<img src="${p.image}" class="w-12 h-12 object-cover rounded border border-neutral-700 flex-shrink-0">` : '';
                 li.innerHTML = `
-                    <div class="flex flex-col truncate pr-2">
+                    ${imgHtml}
+                    <div class="flex flex-col truncate pr-2 flex-1">
                         <span class="font-medium text-white truncate text-[15px]">${escapeHtml(p.name)}</span>
-                        <div class="flex items-center gap-2 mt-1.5 text-xs text-neutral-500">
-                            ${createCatBadgeHTML(cat)}
-                            ${p.defaultPrice ? `<span>&bull;</span><span>${fmtCurrency(p.defaultPrice)} un.</span>` : ''}
-                        </div>
+                        <div class="flex items-center gap-2 mt-1.5 text-xs text-neutral-500">${createCatBadgeHTML(cat)}${p.defaultPrice ? `<span>&bull;</span><span>${fmtCurrency(p.defaultPrice)} un.</span>` : ''}</div>
                     </div>
                     <button onclick="window.deleteProduct('${p.id}')" class="text-neutral-500 hover:text-red-400 p-2 rounded-lg hover:bg-neutral-800 transition-colors flex-shrink-0"><i class="ph ph-trash text-lg"></i></button>
                 `;
                 DOM.productsApp.list.appendChild(li);
             });
         }
-
-        window.deleteProduct = (id) => {
-            appData.products = appData.products.filter(p => p.id !== id);
-            saveData();
-            showToast("Produto removido do catálogo");
-        }
+        window.deleteProduct = (id) => { appData.products = appData.products.filter(p => p.id !== id); saveData(); showToast("Produto removido"); }
 
         function renderCategories() {
             DOM.categoriesApp.list.innerHTML = '';
-            if(appData.categories.length === 0) return;
-            
             appData.categories.forEach((cat) => {
-                const li = document.createElement('li');
-                li.className = "flex justify-between items-center px-4 py-3 bg-neutral-900 rounded-xl border border-neutral-800 shadow-sm group";
-                li.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <div class="w-4 h-4 rounded-full border border-white/10" style="background-color: ${cat.color}"></div>
-                        <span class="font-medium text-white text-sm">${escapeHtml(cat.name)}</span>
-                    </div>
-                    <button onclick="window.deleteCategory('${cat.id}')" class="text-neutral-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-neutral-800 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"><i class="ph ph-trash text-lg"></i></button>
-                `;
+                const li = document.createElement('li'); li.className = "flex justify-between items-center px-4 py-3 bg-neutral-900 rounded-xl border border-neutral-800 shadow-sm group";
+                li.innerHTML = `<div class="flex items-center gap-3"><div class="w-4 h-4 rounded-full border border-white/10" style="background-color: ${cat.color}"></div><span class="font-medium text-white text-sm">${escapeHtml(cat.name)}</span></div><button onclick="window.deleteCategory('${cat.id}')" class="text-neutral-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-neutral-800 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"><i class="ph ph-trash text-lg"></i></button>`;
                 DOM.categoriesApp.list.appendChild(li);
             });
         }
-
         window.deleteCategory = (id) => {
-            if(appData.items.some(i => i.categoryId === id || i.category === id) || appData.products.some(p => p.defaultCategoryId === id || p.defaultCategory === id)) {
-                showToast("Esta categoria está em uso em itens ou produtos!", true); return;
-            }
-            appData.categories = appData.categories.filter(c => c.id !== id);
-            saveData();
-            showToast("Categoria removida");
+            if(appData.items.some(i => i.categoryId === id || i.category === id) || appData.products.some(p => p.defaultCategoryId === id || p.defaultCategory === id)) { showToast("Esta categoria está em uso!", true); return; }
+            appData.categories = appData.categories.filter(c => c.id !== id); saveData(); showToast("Categoria removida");
         };
 
         function renderStats() {
-            let totalIncome = 0;
-            let totalExpense = 0;
-            const byCategory = {};
-            const incomeByCategory = {};
-            const unpaidItems = [];
-
-            const dStart = state.statsDateStart;
-            const dEnd = state.statsDateEnd;
+            let totalIncome = 0; let totalExpense = 0; const byCategory = {}; const incomeByCategory = {}; const unpaidItems = [];
+            const dStart = state.statsDateStart; const dEnd = state.statsDateEnd;
 
             appData.items.forEach(i => {
-                const list = appData.lists.find(l => l.id === i.listId);
-                if (!list) return;
-
-                // Determine effective date for filtering
-                let dateToCheck = null;
-                if(i.isBought && i.boughtAt) {
-                    dateToCheck = new Date(i.boughtAt).toISOString().slice(0, 10);
-                } else if (list.date) {
-                    dateToCheck = list.date.slice(0, 10);
-                }
-
-                if(dateToCheck) {
-                    if (dStart && dateToCheck < dStart) return;
-                    if (dEnd && dateToCheck > dEnd) return;
-                }
-
+                const list = appData.lists.find(l => l.id === i.listId); if (!list) return;
+                let dateToCheck = (i.isBought && i.boughtAt) ? new Date(i.boughtAt).toISOString().slice(0, 10) : (list.date ? list.date.slice(0, 10) : null);
+                if(dateToCheck) { if ((dStart && dateToCheck < dStart) || (dEnd && dateToCheck > dEnd)) return; }
                 const itemTot = i.qtd * (i.price || 0);
-
-                if (list.type === 'entrada') {
-                    if (i.isBought && i.price) {
-                        totalIncome += itemTot;
-                        const catId = i.categoryId || i.category;
-                        incomeByCategory[catId] = (incomeByCategory[catId] || 0) + itemTot;
-                    }
-                } else { // Despesa
-                    if (i.isBought && i.price) {
-                        totalExpense += itemTot;
-                        
-                        // Category summation for paid expenses
-                        const catId = i.categoryId || i.category;
-                        byCategory[catId] = (byCategory[catId] || 0) + itemTot;
-                    } else if (!i.isBought) {
-                        unpaidItems.push({ ...i, listName: list.name });
-                    }
+                if (list.type === 'entrada') { if (i.isBought && i.price) { totalIncome += itemTot; const catId = i.categoryId || i.category; incomeByCategory[catId] = (incomeByCategory[catId] || 0) + itemTot; } } 
+                else {
+                    if (i.isBought && i.price) { totalExpense += itemTot; const catId = i.categoryId || i.category; byCategory[catId] = (byCategory[catId] || 0) + itemTot; }
+                    else if (!i.isBought) { unpaidItems.push({ ...i, listName: list.name }); }
                 }
             });
 
-            // Update Header Cards
-            DOM.statsApp.totalIncome.textContent = fmtCurrency(totalIncome);
-            DOM.statsApp.totalExpense.textContent = fmtCurrency(totalExpense);
-            
-            const balance = totalIncome - totalExpense;
-            DOM.statsApp.balance.textContent = fmtCurrency(balance);
+            DOM.statsApp.totalIncome.textContent = fmtCurrency(totalIncome); DOM.statsApp.totalExpense.textContent = fmtCurrency(totalExpense);
+            const balance = totalIncome - totalExpense; DOM.statsApp.balance.textContent = fmtCurrency(balance);
             DOM.statsApp.balance.className = `text-2xl font-bold tracking-tight ${balance >= 0 ? 'text-blue-400' : 'text-red-400'}`;
 
-            // Render Income Categories Progress Bars
             DOM.statsApp.incomeCategoriesList.innerHTML = '';
-            if(Object.keys(incomeByCategory).length === 0) {
-                DOM.statsApp.incomeCategoriesList.innerHTML = '<div class="text-sm text-neutral-500 py-6 text-center bg-neutral-950 rounded-xl border border-neutral-800 border-dashed">Nenhuma entrada registrada neste período.</div>';
-            } else {
-                const maxIncome = Math.max(...Object.values(incomeByCategory));
-                Object.entries(incomeByCategory)
-                    .sort((a,b) => b[1] - a[1])
-                    .forEach(([catId, val]) => {
-                        const cat = getCategoryDetails(catId);
-                        const w = maxIncome > 0 ? (val / maxIncome) * 100 : 0;
-                        const el = document.createElement('div');
-                        el.className = "flex flex-col gap-1.5";
-                        el.innerHTML = `
-                            <div class="flex justify-between text-sm items-end">
-                                ${createCatBadgeHTML(cat)}
-                                <span class="font-bold text-white text-sm">${fmtCurrency(val)}</span>
-                            </div>
-                            <div class="h-2.5 w-full bg-neutral-950 border border-neutral-800 rounded-full overflow-hidden">
-                                <div class="h-full rounded-full transition-all duration-700" style="width: ${w}%; background-color: ${cat.color}; box-shadow: 0 0 10px ${hexToRgba(cat.color, 0.4)}"></div>
-                            </div>
-                        `;
-                        DOM.statsApp.incomeCategoriesList.appendChild(el);
-                    });
+            if(Object.keys(incomeByCategory).length === 0) DOM.statsApp.incomeCategoriesList.innerHTML = '<div class="text-sm text-neutral-500 py-6 text-center bg-neutral-950 rounded-xl border border-neutral-800 border-dashed">Nenhuma entrada.</div>';
+            else {
+                const max = Math.max(...Object.values(incomeByCategory));
+                Object.entries(incomeByCategory).sort((a,b) => b[1] - a[1]).forEach(([catId, val]) => {
+                    const cat = getCategoryDetails(catId);
+                    DOM.statsApp.incomeCategoriesList.innerHTML += `<div class="flex flex-col gap-1.5"><div class="flex justify-between text-sm items-end">${createCatBadgeHTML(cat)}<span class="font-bold text-white text-sm">${fmtCurrency(val)}</span></div><div class="h-2.5 w-full bg-neutral-950 border border-neutral-800 rounded-full overflow-hidden"><div class="h-full rounded-full transition-all" style="width: ${(val/max)*100}%; background-color: ${cat.color}; box-shadow: 0 0 10px ${hexToRgba(cat.color, 0.4)}"></div></div></div>`;
+                });
             }
 
-            // Render Categories Progress Bars
             DOM.statsApp.categoriesList.innerHTML = '';
-            if(Object.keys(byCategory).length === 0) {
-                DOM.statsApp.categoriesList.innerHTML = '<div class="text-sm text-neutral-500 py-6 text-center bg-neutral-950 rounded-xl border border-neutral-800 border-dashed">Nenhuma despesa paga neste período.</div>';
-            } else {
+            if(Object.keys(byCategory).length === 0) DOM.statsApp.categoriesList.innerHTML = '<div class="text-sm text-neutral-500 py-6 text-center bg-neutral-950 rounded-xl border border-neutral-800 border-dashed">Nenhuma despesa.</div>';
+            else {
                 const max = Math.max(...Object.values(byCategory));
-                Object.entries(byCategory)
-                    .sort((a,b) => b[1] - a[1])
-                    .forEach(([catId, val]) => {
-                        const cat = getCategoryDetails(catId);
-                        const w = max > 0 ? (val / max) * 100 : 0;
-                        const el = document.createElement('div');
-                        el.className = "flex flex-col gap-1.5";
-                        el.innerHTML = `
-                            <div class="flex justify-between text-sm items-end">
-                                ${createCatBadgeHTML(cat)}
-                                <span class="font-bold text-white text-sm">${fmtCurrency(val)}</span>
-                            </div>
-                            <div class="h-2.5 w-full bg-neutral-950 border border-neutral-800 rounded-full overflow-hidden">
-                                <div class="h-full rounded-full transition-all duration-700" style="width: ${w}%; background-color: ${cat.color}; box-shadow: 0 0 10px ${hexToRgba(cat.color, 0.4)}"></div>
-                            </div>
-                        `;
-                        DOM.statsApp.categoriesList.appendChild(el);
-                    });
+                Object.entries(byCategory).sort((a,b) => b[1] - a[1]).forEach(([catId, val]) => {
+                    const cat = getCategoryDetails(catId);
+                    DOM.statsApp.categoriesList.innerHTML += `<div class="flex flex-col gap-1.5"><div class="flex justify-between text-sm items-end">${createCatBadgeHTML(cat)}<span class="font-bold text-white text-sm">${fmtCurrency(val)}</span></div><div class="h-2.5 w-full bg-neutral-950 border border-neutral-800 rounded-full overflow-hidden"><div class="h-full rounded-full transition-all" style="width: ${(val/max)*100}%; background-color: ${cat.color}; box-shadow: 0 0 10px ${hexToRgba(cat.color, 0.4)}"></div></div></div>`;
+                });
             }
 
-            // Render Unpaid Items List
             DOM.statsApp.unpaidItemsList.innerHTML = '';
-            if (unpaidItems.length === 0) {
-                DOM.statsApp.unpaidItemsList.innerHTML = '<div class="text-sm text-neutral-500 py-6 text-center bg-neutral-950 rounded-xl border border-neutral-800 border-dashed">Tudo em dia! Nenhum item pendente nas despesas.</div>';
-            } else {
+            if (unpaidItems.length === 0) DOM.statsApp.unpaidItemsList.innerHTML = '<div class="text-sm text-neutral-500 py-6 text-center bg-neutral-950 rounded-xl border border-neutral-800 border-dashed">Tudo em dia!</div>';
+            else {
                 unpaidItems.sort((a, b) => b.createdAt - a.createdAt).forEach(ui => {
-                    const el = document.createElement('li');
-                    el.className = "flex justify-between items-center p-3 rounded-lg border border-neutral-800 bg-neutral-950 shadow-sm cursor-pointer hover:border-blue-500 hover:bg-neutral-900 transition-all group";
+                    const el = document.createElement('li'); el.className = "flex justify-between items-center p-3 rounded-lg border border-neutral-800 bg-neutral-950 shadow-sm cursor-pointer hover:border-blue-500 hover:bg-neutral-900 transition-all group gap-3";
                     el.setAttribute('onclick', `window.goToUnpaidItem('${ui.listId}', '${ui.id}', '${escapeHtml(ui.name).replace(/'/g, "\\'")}')`);
-                    
-                    const estimatedText = ui.price ? fmtCurrency(ui.price * ui.qtd) : 'Sem valor';
-                    const cat = getCategoryDetails(ui.categoryId || ui.category);
-
+                    const estimatedText = ui.price ? fmtCurrency(ui.price * ui.qtd) : 'Sem valor'; const cat = getCategoryDetails(ui.categoryId || ui.category);
+                    const imgHtml = ui.image ? `<img src="${ui.image}" class="w-10 h-10 object-cover rounded border border-neutral-800 flex-shrink-0">` : '';
                     el.innerHTML = `
-                        <div class="flex flex-col truncate">
-                            <span class="font-medium text-white truncate text-sm group-hover:text-blue-400 transition-colors">${escapeHtml(ui.name)}</span>
-                            <div class="flex items-center gap-1.5 mt-1 text-[11px] text-neutral-500">
-                                <span class="truncate max-w-[100px] border border-neutral-800 bg-neutral-900 px-1 rounded">${escapeHtml(ui.listName)}</span>
-                                <span>&bull;</span>
-                                <span style="color: ${cat.color}">${escapeHtml(cat.name)}</span>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="text-xs font-semibold text-neutral-400 bg-neutral-900 px-2 py-1 rounded border border-neutral-800 group-hover:border-blue-500/30 group-hover:text-blue-300 transition-colors">${estimatedText}</span>
-                            <i class="ph ph-arrow-right text-neutral-600 group-hover:text-blue-400 transition-colors"></i>
-                        </div>
+                        ${imgHtml}
+                        <div class="flex flex-col truncate flex-1"><span class="font-medium text-white truncate text-sm group-hover:text-blue-400 transition-colors">${escapeHtml(ui.name)}</span><div class="flex items-center gap-1.5 mt-1 text-[11px] text-neutral-500"><span class="truncate max-w-[100px] border border-neutral-800 bg-neutral-900 px-1 rounded">${escapeHtml(ui.listName)}</span><span>&bull;</span><span style="color: ${cat.color}">${escapeHtml(cat.name)}</span></div></div>
+                        <div class="flex items-center gap-3"><span class="text-xs font-semibold text-neutral-400 bg-neutral-900 px-2 py-1 rounded border border-neutral-800 group-hover:border-blue-500/30 group-hover:text-blue-300 transition-colors">${estimatedText}</span><i class="ph ph-arrow-right text-neutral-600 group-hover:text-blue-400 transition-colors"></i></div>
                     `;
                     DOM.statsApp.unpaidItemsList.appendChild(el);
                 });
@@ -1199,372 +869,205 @@
             DOM.sidebar.navBtns.forEach(btn => btn.addEventListener('click', (e) => switchView(e.currentTarget.dataset.target)));
             
             const openNewListModal = (listToEdit = null) => {
-                const modal = DOM.modals.newList;
-                const titleHeader = document.getElementById('modal-list-title-header');
-                const submitBtn = document.getElementById('btn-submit-list-modal');
-                const nameInput = document.getElementById('input-new-list-name');
-                const typeInput = document.getElementById('input-new-list-type');
-                const colorInput = document.getElementById('input-new-list-color');
-                const dateInput = document.getElementById('input-new-list-date');
-                const recurringInput = document.getElementById('input-new-list-recurring');
-                const editIdInput = document.getElementById('input-edit-list-id');
-
+                const titleHeader = document.getElementById('modal-list-title-header'); const submitBtn = document.getElementById('btn-submit-list-modal');
                 if (listToEdit) {
-                    titleHeader.textContent = "Editar Lista";
-                    submitBtn.textContent = "Salvar Alterações";
-                    nameInput.value = listToEdit.name;
-                    typeInput.value = listToEdit.type || 'despesa';
-                    colorInput.value = listToEdit.color || '#3b82f6';
-                    dateInput.value = listToEdit.date || getTodayDateStr();
-                    recurringInput.checked = !!listToEdit.isRecurring;
-                    editIdInput.value = listToEdit.id;
+                    titleHeader.textContent = "Editar Lista"; submitBtn.textContent = "Salvar Alterações";
+                    document.getElementById('input-new-list-name').value = listToEdit.name; document.getElementById('input-new-list-type').value = listToEdit.type || 'despesa';
+                    document.getElementById('input-new-list-color').value = listToEdit.color || '#3b82f6'; document.getElementById('input-new-list-date').value = listToEdit.date || getTodayDateStr();
+                    document.getElementById('input-new-list-recurring').checked = !!listToEdit.isRecurring; document.getElementById('input-edit-list-id').value = listToEdit.id;
                 } else {
-                    titleHeader.textContent = "Criar Nova Lista";
-                    submitBtn.textContent = "Criar Lista";
-                    nameInput.value = "";
-                    typeInput.value = "despesa";
-                    colorInput.value = '#3b82f6';
-                    dateInput.value = getTodayDateStr();
-                    recurringInput.checked = false;
-                    editIdInput.value = "";
+                    titleHeader.textContent = "Criar Nova Lista"; submitBtn.textContent = "Criar Lista";
+                    document.getElementById('form-new-list').reset(); document.getElementById('input-new-list-color').value = '#3b82f6';
+                    document.getElementById('input-new-list-date').value = getTodayDateStr(); document.getElementById('input-edit-list-id').value = "";
                 }
-
-                modal.classList.remove('hidden'); modal.classList.add('flex');
-                setTimeout(() => nameInput.focus(), 50);
+                DOM.modals.newList.classList.remove('hidden'); DOM.modals.newList.classList.add('flex'); setTimeout(() => document.getElementById('input-new-list-name').focus(), 50);
             };
 
-            document.querySelectorAll('.btn-trigger-new-list').forEach(btn => {
-                btn.addEventListener('click', () => openNewListModal());
-            });
-            DOM.sidebar.newBtn.addEventListener('click', () => openNewListModal());
+            // FAB setup
+            DOM.fabNewList.addEventListener('click', () => openNewListModal());
 
-            if(DOM.listApp.editSettingsBtn) {
-                DOM.listApp.editSettingsBtn.addEventListener('click', () => {
-                    const list = appData.lists.find(l => l.id === appData.activeListId);
-                    if(list) openNewListModal(list);
-                });
-            }
-            if(DOM.listApp.editSettingsBtnMobile) {
-                DOM.listApp.editSettingsBtnMobile.addEventListener('click', () => {
-                    const list = appData.lists.find(l => l.id === appData.activeListId);
-                    if(list) openNewListModal(list);
-                });
-            }
+            if(DOM.listApp.editSettingsBtn) DOM.listApp.editSettingsBtn.addEventListener('click', () => openNewListModal(appData.lists.find(l => l.id === appData.activeListId)));
+            if(DOM.listApp.editSettingsBtnMobile) DOM.listApp.editSettingsBtnMobile.addEventListener('click', () => openNewListModal(appData.lists.find(l => l.id === appData.activeListId)));
 
             const handleDateChange = (e) => {
                 if(!appData.activeListId) return;
                 const list = appData.lists.find(l => l.id === appData.activeListId);
-                if(list) {
-                    list.date = e.target.value;
-                    DOM.listApp.inputDate.value = list.date;
-                    DOM.listApp.inputDateMobile.value = list.date;
-                    saveDataToStorage();
-                    renderSidebar();
-                    showToast("Data da lista atualizada");
-                }
+                if(list) { list.date = e.target.value; DOM.listApp.inputDate.value = list.date; DOM.listApp.inputDateMobile.value = list.date; saveDataToStorage(); renderSidebar(); showToast("Data da lista atualizada"); }
             };
-            DOM.listApp.inputDate.addEventListener('change', handleDateChange);
-            DOM.listApp.inputDateMobile.addEventListener('change', handleDateChange);
+            DOM.listApp.inputDate.addEventListener('change', handleDateChange); DOM.listApp.inputDateMobile.addEventListener('change', handleDateChange);
 
-            DOM.sidebar.openBtn.addEventListener('click', () => {
-                DOM.sidebar.self.classList.add('open');
-                DOM.sidebar.overlay.classList.remove('hidden');
-                setTimeout(() => DOM.sidebar.overlay.classList.remove('opacity-0'), 10);
-            });
-            window.closeSidebarOnMobile = () => {
-                DOM.sidebar.self.classList.remove('open');
-                DOM.sidebar.overlay.classList.add('opacity-0');
-                setTimeout(() => DOM.sidebar.overlay.classList.add('hidden'), 300);
-            };
-            DOM.sidebar.closeBtn.addEventListener('click', window.closeSidebarOnMobile);
-            DOM.sidebar.overlay.addEventListener('click', window.closeSidebarOnMobile);
-
-            document.querySelectorAll('.btn-close-modal').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const modal = e.currentTarget.closest('.fixed');
-                    modal.classList.add('hidden'); modal.classList.remove('flex');
-                });
-            });
+            DOM.sidebar.openBtn.addEventListener('click', () => { DOM.sidebar.self.classList.add('open'); DOM.sidebar.overlay.classList.remove('hidden'); setTimeout(() => DOM.sidebar.overlay.classList.remove('opacity-0'), 10); });
+            window.closeSidebarOnMobile = () => { DOM.sidebar.self.classList.remove('open'); DOM.sidebar.overlay.classList.add('opacity-0'); setTimeout(() => DOM.sidebar.overlay.classList.add('hidden'), 300); };
+            DOM.sidebar.closeBtn.addEventListener('click', window.closeSidebarOnMobile); DOM.sidebar.overlay.addEventListener('click', window.closeSidebarOnMobile);
+            document.querySelectorAll('.btn-close-modal').forEach(btn => btn.addEventListener('click', (e) => { const modal = e.currentTarget.closest('.fixed'); modal.classList.add('hidden'); modal.classList.remove('flex'); }));
 
             DOM.forms.newList.addEventListener('submit', (e) => {
                 e.preventDefault();
-                const name = document.getElementById('input-new-list-name').value.trim();
-                const type = document.getElementById('input-new-list-type').value;
-                const color = document.getElementById('input-new-list-color').value;
-                const date = document.getElementById('input-new-list-date').value || getTodayDateStr();
-                const isRecurring = document.getElementById('input-new-list-recurring').checked;
-                const editId = document.getElementById('input-edit-list-id').value;
-
+                const name = document.getElementById('input-new-list-name').value.trim(); const type = document.getElementById('input-new-list-type').value; const color = document.getElementById('input-new-list-color').value; const date = document.getElementById('input-new-list-date').value || getTodayDateStr(); const isRecurring = document.getElementById('input-new-list-recurring').checked; const editId = document.getElementById('input-edit-list-id').value;
                 if(!name) return;
-                
                 if (editId) {
                     const list = appData.lists.find(l => l.id === editId);
-                    if(list) {
-                        list.name = name;
-                        list.type = type;
-                        list.color = color;
-                        list.date = date;
-                        list.isRecurring = isRecurring;
-                    }
-                    DOM.modals.newList.classList.add('hidden'); DOM.modals.newList.classList.remove('flex');
-                    saveData();
+                    if(list) { list.name = name; list.type = type; list.color = color; list.date = date; list.isRecurring = isRecurring; }
                     showToast("Lista atualizada");
                 } else {
-                    const newList = { 
-                        id: generateId(), 
-                        name, type, color, date, isRecurring, 
-                        createdAt: Date.now(),
-                        lastResetMonth: isRecurring ? date.slice(0, 7) : null 
-                    };
-                    appData.lists.push(newList);
-                    
-                    DOM.modals.newList.classList.add('hidden'); DOM.modals.newList.classList.remove('flex');
-                    appData.activeListId = newList.id;
-                    saveData();
-                    showToast("Lista criada");
+                    const newList = { id: generateId(), name, type, color, date, isRecurring, createdAt: Date.now(), lastResetMonth: isRecurring ? date.slice(0, 7) : null };
+                    appData.lists.push(newList); appData.activeListId = newList.id; showToast("Lista criada");
                 }
+                DOM.modals.newList.classList.add('hidden'); DOM.modals.newList.classList.remove('flex'); saveData();
             });
 
             const deleteCurrentList = () => {
                 if(!appData.activeListId) return;
                 if (confirm('Tem certeza que deseja excluir esta lista inteira?')) {
-                    appData.lists = appData.lists.filter(l => l.id !== appData.activeListId);
-                    appData.items = appData.items.filter(i => i.listId !== appData.activeListId);
-                    appData.activeListId = null;
-                    saveData();
-                    showToast("Lista apagada");
+                    appData.lists = appData.lists.filter(l => l.id !== appData.activeListId); appData.items = appData.items.filter(i => i.listId !== appData.activeListId);
+                    appData.activeListId = null; saveData(); showToast("Lista apagada");
                 }
             };
-            DOM.listApp.deleteBtn.addEventListener('click', deleteCurrentList);
-            DOM.listApp.deleteBtnMobile.addEventListener('click', deleteCurrentList);
+            DOM.listApp.deleteBtn.addEventListener('click', deleteCurrentList); DOM.listApp.deleteBtnMobile.addEventListener('click', deleteCurrentList);
+
+            // Image input change handler for Add Item
+            DOM.listApp.inputImage.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    try {
+                        const base64 = await resizeImage(file);
+                        DOM.listApp.inputImageBase64.value = base64;
+                        DOM.listApp.previewImage.src = base64;
+                        DOM.listApp.previewImage.classList.remove('hidden');
+                        DOM.listApp.iconImage.classList.add('hidden');
+                    } catch (err) { showToast("Erro ao carregar imagem", true); }
+                } else { resetImageInput(); }
+            });
+
+            function resetImageInput() {
+                DOM.listApp.inputImage.value = ''; DOM.listApp.inputImageBase64.value = '';
+                DOM.listApp.previewImage.src = ''; DOM.listApp.previewImage.classList.add('hidden');
+                DOM.listApp.iconImage.classList.remove('hidden');
+            }
 
             DOM.forms.addItem.addEventListener('submit', (e) => {
-                e.preventDefault();
-                if(!appData.activeListId) return;
-                
-                const name = DOM.listApp.inputName.value.trim();
-                const categoryId = DOM.listApp.inputCat.value;
-                const qtd = parseFloat(DOM.listApp.inputQtd.value) || 1;
-                const unit = DOM.listApp.inputUnit.value;
-                const priceVal = DOM.listApp.inputPrice.value;
-                const price = priceVal !== "" ? parseFloat(priceVal) : null;
+                e.preventDefault(); if(!appData.activeListId) return;
+                const name = DOM.listApp.inputName.value.trim(); const categoryId = DOM.listApp.inputCat.value; const qtd = parseFloat(DOM.listApp.inputQtd.value) || 1; const unit = DOM.listApp.inputUnit.value; const priceVal = DOM.listApp.inputPrice.value; const price = priceVal !== "" ? parseFloat(priceVal) : null;
+                const imgBase64 = DOM.listApp.inputImageBase64.value || null;
 
                 if(!name || !categoryId) return;
-
-                const existingProd = appData.products.find(p => p.name.toLowerCase() === name.toLowerCase());
-                if (!existingProd) {
-                    appData.products.push({
-                        id: generateId(),
-                        name: name,
-                        defaultCategoryId: categoryId,
-                        defaultPrice: price,
-                        createdAt: Date.now()
-                    });
+                if (!appData.products.some(p => p.name.toLowerCase() === name.toLowerCase())) { 
+                    appData.products.push({ id: generateId(), name: name, defaultCategoryId: categoryId, defaultPrice: price, image: imgBase64, createdAt: Date.now() }); 
+                } else if(imgBase64) {
+                    // Update existing catalog product image if a new one is uploaded during list insertion
+                    const existingProduct = appData.products.find(p => p.name.toLowerCase() === name.toLowerCase());
+                    if(existingProduct && !existingProduct.image) existingProduct.image = imgBase64;
                 }
-
-                appData.items.push({
-                    id: generateId(),
-                    listId: appData.activeListId,
-                    name, categoryId, qtd, unit, price,
-                    isBought: false, boughtAt: null, createdAt: Date.now()
-                });
-
-                saveData();
-                DOM.listApp.inputName.value = ''; 
-                DOM.listApp.inputQtd.value = '1'; 
-                DOM.listApp.inputPrice.value = '';
-                DOM.listApp.inputName.focus(); 
-                DOM.listApp.suggestions.classList.add('hidden');
-                showToast("Item adicionado!");
+                
+                appData.items.push({ id: generateId(), listId: appData.activeListId, name, categoryId, qtd, unit, price, image: imgBase64, isBought: false, boughtAt: null, createdAt: Date.now() });
+                saveData(); 
+                DOM.listApp.inputName.value = ''; DOM.listApp.inputQtd.value = '1'; DOM.listApp.inputPrice.value = ''; resetImageInput();
+                DOM.listApp.inputName.focus(); DOM.listApp.suggestions.classList.add('hidden'); showToast("Item adicionado!");
             });
 
             DOM.forms.addPrice.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const itemId = document.getElementById('input-price-item-id').value;
-                const actionType = document.getElementById('input-price-action-type').value;
-                const price = parseFloat(document.getElementById('input-price-val').value);
-                
+                e.preventDefault(); const itemId = document.getElementById('input-price-item-id').value; const actionType = document.getElementById('input-price-action-type').value; const price = parseFloat(document.getElementById('input-price-val').value);
                 if(isNaN(price) || price < 0) return;
-
                 const item = appData.items.find(i => i.id === itemId);
-                if(item) {
-                    item.price = price;
-                    if(actionType === 'check') {
-                        item.isBought = true;
-                        item.boughtAt = Date.now();
-                    }
-                    saveData();
-                    showToast(actionType === 'check' ? "Concluído!" : "Valor atualizado!");
-                }
+                if(item) { item.price = price; if(actionType === 'check') { item.isBought = true; item.boughtAt = Date.now(); } saveData(); showToast(actionType === 'check' ? "Concluído!" : "Valor atualizado!"); }
                 DOM.modals.addPrice.classList.add('hidden'); DOM.modals.addPrice.classList.remove('flex');
             });
 
             DOM.listApp.inputName.addEventListener('input', (e) => {
-                const val = e.target.value.toLowerCase().trim();
-                if(!val) { DOM.listApp.suggestions.classList.add('hidden'); return; }
-                const matches = appData.products.filter(p => p.name.toLowerCase().includes(val));
-                if(matches.length === 0) { DOM.listApp.suggestions.classList.add('hidden'); return; }
-
+                const val = e.target.value.toLowerCase().trim(); if(!val) { DOM.listApp.suggestions.classList.add('hidden'); return; }
+                const matches = appData.products.filter(p => p.name.toLowerCase().includes(val)); if(matches.length === 0) { DOM.listApp.suggestions.classList.add('hidden'); return; }
                 DOM.listApp.suggestions.innerHTML = '';
                 matches.forEach(m => {
-                    const cat = getCategoryDetails(m.defaultCategoryId || m.defaultCategory);
-                    const li = document.createElement('li');
-                    li.className = "px-4 py-2.5 hover:bg-neutral-700 cursor-pointer text-sm text-white border-b border-neutral-700/50 last:border-0 font-medium transition-colors flex justify-between items-center";
-                    li.innerHTML = `<span>${escapeHtml(m.name)}</span> ${createCatBadgeHTML(cat)}`;
-                    li.onclick = () => {
-                        DOM.listApp.inputName.value = m.name; 
-                        DOM.listApp.inputCat.value = m.defaultCategoryId || m.defaultCategory || appData.categories[0]?.id;
-                        if(m.defaultPrice) DOM.listApp.inputPrice.value = m.defaultPrice;
-                        DOM.listApp.suggestions.classList.add('hidden'); DOM.listApp.inputQtd.focus();
+                    const cat = getCategoryDetails(m.defaultCategoryId || m.defaultCategory); const li = document.createElement('li'); li.className = "px-4 py-2.5 hover:bg-neutral-700 cursor-pointer text-sm text-white border-b border-neutral-700/50 last:border-0 font-medium transition-colors flex justify-between items-center gap-3"; 
+                    const imgThumb = m.image ? `<img src="${m.image}" class="w-6 h-6 rounded object-cover">` : '';
+                    li.innerHTML = `<div class="flex items-center gap-2">${imgThumb} <span>${escapeHtml(m.name)}</span></div> ${createCatBadgeHTML(cat)}`;
+                    li.onclick = () => { 
+                        DOM.listApp.inputName.value = m.name; DOM.listApp.inputCat.value = m.defaultCategoryId || m.defaultCategory || appData.categories[0]?.id; 
+                        if(m.defaultPrice) DOM.listApp.inputPrice.value = m.defaultPrice; 
+                        if(m.image) {
+                            DOM.listApp.inputImageBase64.value = m.image;
+                            DOM.listApp.previewImage.src = m.image;
+                            DOM.listApp.previewImage.classList.remove('hidden');
+                            DOM.listApp.iconImage.classList.add('hidden');
+                        }
+                        DOM.listApp.suggestions.classList.add('hidden'); DOM.listApp.inputQtd.focus(); 
                     };
                     DOM.listApp.suggestions.appendChild(li);
-                });
-                DOM.listApp.suggestions.classList.remove('hidden');
+                }); DOM.listApp.suggestions.classList.remove('hidden');
             });
-            
-            document.addEventListener('click', (e) => {
-                if(!DOM.listApp.inputName.contains(e.target) && !DOM.listApp.suggestions.contains(e.target)) {
-                    DOM.listApp.suggestions.classList.add('hidden');
-                }
-            });
+            document.addEventListener('click', (e) => { if(!DOM.listApp.inputName.contains(e.target) && !DOM.listApp.suggestions.contains(e.target)) DOM.listApp.suggestions.classList.add('hidden'); });
 
-            if (DOM.listApp.btnOpenCatalog) {
-                DOM.listApp.btnOpenCatalog.addEventListener('click', () => {
-                    renderCatalogSelection();
-                    DOM.modals.selectCatalog.classList.remove('hidden'); 
-                    DOM.modals.selectCatalog.classList.add('flex');
-                });
-            }
-
-            DOM.forms.addProduct.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const name = DOM.productsApp.inputName.value.trim();
-                const defaultCategoryId = DOM.productsApp.inputCat.value;
-                const pVal = DOM.productsApp.inputPrice.value;
-                const defaultPrice = pVal ? parseFloat(pVal) : null;
-                
-                appData.products.push({ id: generateId(), name, defaultCategoryId, defaultPrice, createdAt: Date.now() });
-                saveData();
-                DOM.forms.addProduct.reset(); 
-                showToast("Produto salvo no catálogo!");
-            });
+            if (DOM.listApp.btnOpenCatalog) DOM.listApp.btnOpenCatalog.addEventListener('click', () => { renderCatalogSelection(); DOM.modals.selectCatalog.classList.remove('hidden'); DOM.modals.selectCatalog.classList.add('flex'); });
 
             DOM.forms.addCategory.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const name = DOM.categoriesApp.inputName.value.trim();
-                const color = DOM.categoriesApp.inputColor.value;
-                
-                if(appData.categories.some(c => c.name.toLowerCase() === name.toLowerCase())) {
-                    showToast("Já existe uma categoria com este nome", true); return;
-                }
-                
-                appData.categories.push({ id: generateId(), name, color });
-                saveData();
-                DOM.forms.addCategory.reset();
-                DOM.categoriesApp.inputColor.value = '#3b82f6';
-                showToast("Categoria adicionada!");
+                e.preventDefault(); const name = DOM.categoriesApp.inputName.value.trim(); const color = DOM.categoriesApp.inputColor.value;
+                if(appData.categories.some(c => c.name.toLowerCase() === name.toLowerCase())) { showToast("Já existe uma categoria com este nome", true); return; }
+                appData.categories.push({ id: generateId(), name, color }); saveData(); DOM.forms.addCategory.reset(); DOM.categoriesApp.inputColor.value = '#3b82f6'; showToast("Categoria adicionada!");
             });
 
-            DOM.statsApp.btnApply.addEventListener('click', () => {
-                state.statsDateStart = DOM.statsApp.dateStart.value;
-                state.statsDateEnd = DOM.statsApp.dateEnd.value;
-                renderStats();
+            DOM.statsApp.btnApply.addEventListener('click', () => { state.statsDateStart = DOM.statsApp.dateStart.value; state.statsDateEnd = DOM.statsApp.dateEnd.value; renderStats(); });
+            DOM.sidebar.searchInput.addEventListener('input', (e) => { state.listSearchQuery = e.target.value; renderSidebar(); });
+            DOM.sidebar.sortSelect.addEventListener('change', (e) => { state.listSortOrder = e.target.value; renderSidebar(); });
+            DOM.sidebar.monthFilter.addEventListener('change', (e) => { state.listMonthFilter = e.target.value; renderSidebar(); });
+            
+            DOM.settingsApp.btnExport.addEventListener('click', () => {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
+                const downloadAnchorNode = document.createElement('a'); downloadAnchorNode.setAttribute("href", dataStr); downloadAnchorNode.setAttribute("download", "anylist_backup_" + getTodayDateStr() + ".json");
+                document.body.appendChild(downloadAnchorNode); downloadAnchorNode.click(); downloadAnchorNode.remove(); showToast("Backup baixado com sucesso!");
             });
 
-            if (DOM.sidebar.searchInput) {
-                DOM.sidebar.searchInput.addEventListener('input', (e) => {
-                    state.listSearchQuery = e.target.value;
-                    renderSidebar();
-                });
-            }
-
-            if (DOM.sidebar.sortSelect) {
-                DOM.sidebar.sortSelect.addEventListener('change', (e) => {
-                    state.listSortOrder = e.target.value;
-                    renderSidebar();
-                });
-            }
+            DOM.settingsApp.inputImport.addEventListener('change', (event) => {
+                const file = event.target.files[0]; if (!file) return; const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        if(importedData.categories && importedData.lists && importedData.items) { appData = importedData; saveData(); showToast("Dados restaurados com sucesso!"); } 
+                        else { throw new Error("Invalid format"); }
+                    } catch(err) { showToast("Erro ao ler o arquivo JSON.", true); }
+                };
+                reader.readAsText(file);
+            });
         }
 
         function updateCategorySelects() {
-            const selects = [DOM.listApp.inputCat, DOM.productsApp.inputCat];
-            selects.forEach(select => {
-                if(!select) return;
-                const currentVal = select.value;
-                select.innerHTML = '';
-                appData.categories.forEach(cat => {
-                    const opt = document.createElement('option');
-                    opt.value = cat.id; opt.textContent = cat.name;
-                    select.appendChild(opt);
-                });
-                if(appData.categories.some(c => c.id === currentVal)) {
-                    select.value = currentVal;
-                } else if(appData.categories.length > 0) {
-                    select.value = appData.categories[0].id;
-                }
+            [DOM.listApp.inputCat].forEach(select => {
+                if(!select) return; const currentVal = select.value; select.innerHTML = '';
+                appData.categories.forEach(cat => { const opt = document.createElement('option'); opt.value = cat.id; opt.textContent = cat.name; select.appendChild(opt); });
+                if(appData.categories.some(c => c.id === currentVal)) select.value = currentVal; else if(appData.categories.length > 0) select.value = appData.categories[0].id;
             });
         }
 
         function renderCatalogSelection() {
-            const list = DOM.listApp.catalogSelectionList;
-            if(!list) return;
-            list.innerHTML = '';
-            
-            if(appData.products.length === 0) {
-                list.innerHTML = '<div class="text-neutral-500 text-sm text-center py-8 bg-neutral-950 rounded-xl border border-neutral-800 border-dashed">Catálogo vazio.</div>';
-                return;
-            }
-
-            const sorted = [...appData.products].sort((a,b) => a.name.localeCompare(b.name));
-            
-            sorted.forEach(p => {
-                const cat = getCategoryDetails(p.defaultCategoryId || p.defaultCategory);
-                const li = document.createElement('li');
-                li.className = "flex justify-between items-center px-4 py-3 bg-neutral-950 hover:bg-neutral-800 rounded-xl border border-neutral-800 cursor-pointer transition-colors shadow-sm group";
+            const list = DOM.listApp.catalogSelectionList; if(!list) return; list.innerHTML = '';
+            if(appData.products.length === 0) { list.innerHTML = '<div class="text-neutral-500 text-sm text-center py-8 bg-neutral-950 rounded-xl border border-neutral-800 border-dashed">Catálogo vazio.</div>'; return; }
+            [...appData.products].sort((a,b) => a.name.localeCompare(b.name)).forEach(p => {
+                const cat = getCategoryDetails(p.defaultCategoryId || p.defaultCategory); const li = document.createElement('li'); li.className = "flex justify-between items-center px-4 py-3 bg-neutral-950 hover:bg-neutral-800 rounded-xl border border-neutral-800 cursor-pointer transition-colors shadow-sm group gap-3";
+                const imgHtml = p.image ? `<img src="${p.image}" class="w-10 h-10 object-cover rounded border border-neutral-700 flex-shrink-0">` : '';
                 li.innerHTML = `
-                    <div class="flex flex-col truncate pr-2">
-                        <span class="font-medium text-white truncate text-[15px] group-hover:text-blue-400 transition-colors">${escapeHtml(p.name)}</span>
-                        <div class="flex items-center gap-2 mt-1.5 text-xs text-neutral-500">
-                            ${createCatBadgeHTML(cat)}
-                            ${p.defaultPrice ? `<span>&bull;</span><span>${fmtCurrency(p.defaultPrice)} un.</span>` : ''}
-                        </div>
-                    </div>
-                    <i class="ph ph-plus-circle text-xl text-neutral-500 group-hover:text-blue-400"></i>
-                `;
-                li.onclick = () => {
-                    DOM.listApp.inputName.value = p.name;
-                    DOM.listApp.inputCat.value = p.defaultCategoryId || p.defaultCategory || appData.categories[0]?.id;
-                    DOM.listApp.inputPrice.value = p.defaultPrice || '';
-                    DOM.modals.selectCatalog.classList.add('hidden'); 
-                    DOM.modals.selectCatalog.classList.remove('flex');
-                    DOM.listApp.inputQtd.focus();
+                    ${imgHtml}
+                    <div class="flex flex-col truncate pr-2 flex-1"><span class="font-medium text-white truncate text-[15px] group-hover:text-blue-400 transition-colors">${escapeHtml(p.name)}</span><div class="flex items-center gap-2 mt-1.5 text-xs text-neutral-500">${createCatBadgeHTML(cat)}${p.defaultPrice ? `<span>&bull;</span><span>${fmtCurrency(p.defaultPrice)} un.</span>` : ''}</div></div><i class="ph ph-plus-circle text-xl text-neutral-500 group-hover:text-blue-400"></i>`;
+                li.onclick = () => { 
+                    DOM.listApp.inputName.value = p.name; DOM.listApp.inputCat.value = p.defaultCategoryId || p.defaultCategory || appData.categories[0]?.id; DOM.listApp.inputPrice.value = p.defaultPrice || ''; 
+                    if(p.image) {
+                        DOM.listApp.inputImageBase64.value = p.image;
+                        DOM.listApp.previewImage.src = p.image;
+                        DOM.listApp.previewImage.classList.remove('hidden');
+                        DOM.listApp.iconImage.classList.add('hidden');
+                    }
+                    DOM.modals.selectCatalog.classList.add('hidden'); DOM.modals.selectCatalog.classList.remove('flex'); DOM.listApp.inputQtd.focus(); 
                 };
                 list.appendChild(li);
             });
         }
 
         function showToast(msg, isError = false) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-message').textContent = msg;
-            const icon = document.getElementById('toast-icon');
-            
-            if(isError) {
-                icon.className = "ph ph-warning-circle text-red-400 text-xl";
-            } else {
-                icon.className = "ph ph-check-circle text-emerald-400 text-xl";
-            }
-
-            toast.classList.remove('translate-y-24', 'opacity-0');
-            setTimeout(() => toast.classList.add('translate-y-24', 'opacity-0'), 3000);
+            const toast = document.getElementById('toast'); document.getElementById('toast-message').textContent = msg; const icon = document.getElementById('toast-icon');
+            icon.className = isError ? "ph ph-warning-circle text-red-400 text-xl" : "ph ph-check-circle text-emerald-400 text-xl";
+            toast.classList.remove('translate-y-24', 'opacity-0'); setTimeout(() => toast.classList.add('translate-y-24', 'opacity-0'), 3000);
         }
 
-        function escapeHtml(unsafe) {
-            if(typeof unsafe !== 'string') return unsafe;
-            return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-        }
-
-        setupEventListeners();
-        loadData();
+        // Initialize application
+        setupEventListeners(); loadData();
     </script>
 </body>
 </html>
